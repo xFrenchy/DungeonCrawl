@@ -24,6 +24,8 @@ public:
 
 	bool getGameOver() { return gameOver; }
 	int getMaxRooms() { return maxRooms; }
+
+	void playGame();
 };
 
 class Dungeon
