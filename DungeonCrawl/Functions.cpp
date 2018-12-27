@@ -46,3 +46,24 @@ void gameOver()
 	std::cout << "Game over!\n";
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
+
+bool isValidYesNo(char letter)
+{
+	letter = toupper(letter);
+	if (letter == 'Y')
+	{
+		return true;
+	}
+	else if (letter == 'N')
+	{
+		return true;
+	}
+	else
+	{
+		cout << "Invalid answer, try again\n";
+		std::cin.ignore(255, '\n');
+		std::cin.clear();
+		return false;
+	}
+	return false;
+}
