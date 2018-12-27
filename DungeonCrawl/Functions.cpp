@@ -2,6 +2,9 @@
 #include "Game.h"
 
 #include <iostream>	//cout
+#include <thread>	//this_thread::sleep_for
+#include <chrono>	//chrone::seconds
+
 using std::cout;
 
 void displayIntro()
@@ -36,4 +39,10 @@ EGameStatus askToPlayGame()
 		std::cin.clear();
 		return EGameStatus::Invalid_guess;
 	}
+}
+
+void gameOver()
+{
+	std::cout << "Game over!\n";
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
