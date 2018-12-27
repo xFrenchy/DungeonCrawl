@@ -28,6 +28,17 @@ public:
 	Dungeon();
 };
 
+class Player
+{
+private:
+	int health;
+public:
+	Player();
+	void setHealth(int _health) { health = _health; }
+
+	int getHealth() { return health; }
+};
+
 class Game
 {
 private:
@@ -35,6 +46,7 @@ private:
 	Dungeon dungeonRoom;
 	int maxRooms;	//keeps track of how many rooms there is supposed to be during the game
 	int currentRoomNumber;
+	Player player;
 public:
 	Game();
 	void setGameOver(bool _gameOver) { gameOver = _gameOver; }
