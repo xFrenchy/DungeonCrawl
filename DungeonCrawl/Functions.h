@@ -3,3 +3,4 @@
 
 void displayIntro();
 EGameStatus askToPlayGame();
+void gameOver();
