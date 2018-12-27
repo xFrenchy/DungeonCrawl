@@ -2,6 +2,8 @@
 #ifndef GAMES_H
 #define GAMES_H
 
+const int amountOfEncounterTypes = 5;
+
 
 enum class EGameStatus
 {
@@ -26,6 +28,12 @@ private:
 	ETypeOfEncounter roomType;
 public:
 	Dungeon();
+	void setRoomType(ETypeOfEncounter _roomType) { roomType = _roomType; }
+
+	ETypeOfEncounter getRoomType() { return roomType; }
+
+	void generateRoomType();
+	void emptyRoom();
 };
 
 class Player
