@@ -2,13 +2,30 @@
 #ifndef GAMES_H
 #define GAMES_H
 
-class Dungeon;
 
 enum class EGameStatus
 {
 	Invalid_guess,
 	Play,
-	EndGame
+	EndGame,
+	Move_forward
+};
+
+enum class ETypeOfEncounter
+{
+	Treasure,
+	Minion,
+	Empty,
+	Boss,
+	Shop
+};
+
+class Dungeon
+{
+private:
+	ETypeOfEncounter roomType;
+public:
+	Dungeon();
 };
 
 class Game
@@ -28,16 +45,11 @@ public:
 	int getMaxRooms() { return maxRooms; }
 	int getCurrentRoomNumber() { return currentRoomNumber; }
 
-	void playGame();
+	EGameStatus playGame();
 };
 
-class Dungeon
-{
-private:
 
-public:
-	Dungeon();
-};
+
 
 #endif // !GAMES_H
 
