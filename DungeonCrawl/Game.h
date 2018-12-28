@@ -28,13 +28,22 @@ class Player
 private:
 	int health;
 	bool isAlive;
+	int attackStat;
+	int strengthStat;
+	int defenceStat;
 public:
 	Player();
 	void setHealth(int _health) { health = _health; }
 	void setAlive(bool _isAlive) { isAlive = _isAlive; }
+	void setAttackStat(int _attackStat) { attackStat = _attackStat; }
+	void setStrengthStat(int _strengthStat) { strengthStat = _strengthStat; }
+	void setDefenceStat(int _defenceStat) { defenceStat = _defenceStat; }
 
 	int getHealth() { return health; }
 	bool getIsAlive() { return isAlive; }
+	int getAttackStat() { return attackStat; }
+	int getStrengthStat() { return strengthStat; }
+	int getDefenceStat() { return defenceStat; }
 	
 	int attack();
 };
@@ -45,13 +54,22 @@ class Monster
 private:
 	int health;
 	bool isAlive;
+	int attackStat;
+	int strengthStat;
+	int defenceStat;
 public:
 	Monster() { ; }
 	void setHealth(int _health) { health = _health; }
 	void setAlive(bool _isAlive) { isAlive = _isAlive; }
+	void setAttackStat(int _attackStat) { attackStat = _attackStat; }
+	void setStrengthStat(int _strengthStat) { strengthStat = _strengthStat; }
+	void setDefenceStat(int _defenceStat) { defenceStat = _defenceStat; }
 
 	int getHealth() { return health; }
 	bool getIsAlive() { return isAlive; }
+	int getAttackStat() { return attackStat; }
+	int getStrengthStat() { return strengthStat; }
+	int getDefenceStat() { return defenceStat; }
 
 	virtual int attack() = 0;
 	virtual bool isEscape() = 0;
