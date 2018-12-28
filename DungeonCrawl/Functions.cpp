@@ -69,6 +69,7 @@ bool isValidYesNo(char letter)
 	return false;
 }
 
+//forces the user to enter a 1 or 2
 int intOneorTwo()
 {
 	int choice;
@@ -78,12 +79,12 @@ int intOneorTwo()
 		cin >> choice;
 		if (cin.fail())	//if cin was not an int
 		{
-			cout << "That was not an int!\n";
-			cin.ignore(255, '\n');
+			cout << "\nThat was not an int!\nTry again:";
 			cin.clear();
+			cin.ignore(255, '\n');
 		}
 		//else the input was an int
-		if (choice == 1)
+		else if (choice == 1)
 		{
 			valid = true;
 			return choice;
