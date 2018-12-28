@@ -22,6 +22,53 @@ enum class ETypeOfEncounter
 	Shop
 };
 
+
+class Player
+{
+private:
+	int health;
+	bool isAlive;
+public:
+	Player();
+	void setHealth(int _health) { health = _health; }
+	void setAlive(bool _isAlive) { isAlive = _isAlive; }
+
+	int getHealth() { return health; }
+	bool getIsAlive() { return isAlive; }
+	
+	int attack();
+};
+
+
+class Monster
+{
+private:
+	int health;
+	bool isAlive;
+public:
+	Monster() { ; }
+	void setHealth(int _health) { health = _health; }
+	void setAlive(bool _isAlive) { isAlive = _isAlive; }
+
+	int getHealth() { return health; }
+	bool getIsAlive() { return isAlive; }
+
+	virtual int attack() = 0;
+	virtual bool isEscape() = 0;
+};
+
+
+class Minion : public Monster
+{
+private:
+
+public:
+	Minion();
+	int attack();
+	bool isEscape();
+};
+
+
 class Dungeon
 {
 private:
@@ -34,18 +81,9 @@ public:
 
 	void generateRoomType();
 	void emptyRoom();
+	void minionRoom(Player &p1);
 };
 
-class Player
-{
-private:
-	int health;
-public:
-	Player();
-	void setHealth(int _health) { health = _health; }
-
-	int getHealth() { return health; }
-};
 
 class Game
 {
