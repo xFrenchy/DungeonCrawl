@@ -1,17 +1,19 @@
-Dungeon Crawler Game 
+Dungeon Crawler Game (Work in Progress)
 
 At the current stage: 
 
-the user is asked if they want to play 
+The user is asked if they want to play 
 
-the user is asked if they want to proceed to the next level 
+There are only 5 Dungeon rooms that are being randomly generated,
+
+The user is asked if they want to proceed to the next level for every level
 
 levels go up and reach an end 
 
-only two encounter are implemented (empty room, minion)
+only three encounter are implemented (empty room, minion, boss)
 
-During minion encouter, player fights the minion with random numbers generated for attacks
+During minion encouter, player fights the minion with random numbers generated for attacks based on player stats
 
-Player can also attempt to run away from the minion at the start
+Player can also attempt to run away from the minion and boss at the start
 
 once the end of the dungeon is reached, game is over 
