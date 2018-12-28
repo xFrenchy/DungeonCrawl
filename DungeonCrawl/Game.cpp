@@ -5,6 +5,7 @@
 #include <thread>	//this_thread::sleep_for
 #include <chrono>	//chrone::seconds
 #include <cstdlib>	//rand
+#include <stdlib.h>	//clear screan system("CLS")
 
 using std::cout;
 
@@ -40,6 +41,7 @@ EGameStatus Game::playGame()
 			break;
 		case ETypeOfEncounter::Minion:
 			//execute code for minion room
+			dungeonRoom.minionRoom(player);
 			break;
 		case ETypeOfEncounter::Shop:
 			//execute code for shop room
@@ -55,6 +57,7 @@ EGameStatus Game::playGame()
 		//once we're done with the playable part, if possible we move on to the next room
 		if (player.getHealth() <= 0)
 		{
+			cout << "Oh dear, you have died!\n";
 			return EGameStatus::EndGame;
 		}
 		else	//else we move forward
@@ -101,6 +104,7 @@ Dungeon::Dungeon()
 
 void Dungeon::generateRoomType()
 {
+	//TODO create rarity to rooms
 	int result = rand() % amountOfEncounterTypes;
 	switch (result)
 	{
@@ -134,7 +138,98 @@ void Dungeon::emptyRoom()
 	return;
 }
 
+void Dungeon::minionRoom(Player &p1)
+{
+	//Player will always go first
+	Minion minion;	//minion spawned in the room
+	int userChoice;
+	cout << "You've encountered a minion!\n"
+		<< "\nWould you like to try to fight or run?\n"
+		<< "1)Fight\n"
+		<< "2)Run\n";
+	//check that userChoice is valid
+	userChoice = intOneorTwo();	//this forces the user to type in a 1 or a 2 so I know userChoice is either a 1 or a 2 after that function
+	if (userChoice == 2)
+	{
+		//attempt to escape
+		bool hasEscaped = false;
+		hasEscaped = minion.isEscape();
+		if (hasEscaped == true)
+		{
+			return;
+		}
+	}
+	//else we fight
+	//TODO execute fight
+	system("CLS");	//clears the screen
+	cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
+	do
+	{
+		minion.setHealth(minion.getHealth() - p1.attack());	//player attacked the minion and updated health
+		if (minion.getHealth() <= 0)
+		{
+			minion.setAlive(false);
+		}
+		if (minion.getIsAlive() == false)
+		{
+			system("CLS");
+			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
+			cout << "You defeated the minion!\n";
+			break;
+		}
+		//End of turn for player attacking minion
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+		p1.setHealth(p1.getHealth() - minion.attack());
+		if (p1.getHealth() <= 0)
+		{
+			p1.setAlive(false);
+		}
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
+	return;
+}
+
 Player::Player()
 {
 	health = 100;
+	isAlive = true;
+}
+
+int Player::attack()
+{
+	//Player's attack will vary only based on the stats the player has
+	//TODO implement stats to affect player attacks
+	return (rand() % 16);	//default range is between 0-15
+}
+
+Minion::Minion()
+{
+	setHealth(20);
+	setAlive(true);
+}
+
+int Minion::attack()
+{
+	//A minion should hit low and should never be able to kill the player unless the player was low to begin with
+	//A minion should be a slight annoyance with potential to have ok loot to compensate for
+	//TODO make a more rich attack
+	return (rand() % 11);	//minion can hit from 0-10
+}
+
+bool Minion::isEscape()
+{
+	//player will have a 25% chance of escaping any minion encounter
+	int chance = (rand() % 4);	//range is 0-3
+	if (chance == 0)
+	{
+		cout << "You have succefully escaped from the minion!\n\n";
+		return true;
+	}
+	return false;	//else return false because the player did not manage to escape
 }
