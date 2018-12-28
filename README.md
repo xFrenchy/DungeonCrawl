@@ -8,6 +8,10 @@ the user is asked if they want to proceed to the next level
 
 levels go up and reach an end 
 
-only one encounter is implemented (empty room) 
+only two encounter are implemented (empty room, minion)
 
-once the end is reached, game is over 
+During minion encouter, player fights the minion with random numbers generated for attacks
+
+Player can also attempt to run away from the minion at the start
+
+once the end of the dungeon is reached, game is over 
