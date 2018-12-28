@@ -87,6 +87,16 @@ public:
 };
 
 
+class Boss : public Monster
+{
+private:
+
+public:
+	Boss();
+	int attack();
+	bool isEscape();
+};
+
 class Dungeon
 {
 private:
@@ -100,6 +110,7 @@ public:
 	void generateRoomType();
 	void emptyRoom();
 	void minionRoom(Player &p1);
+	void bossRoom(Player &p1);
 };
 
 
