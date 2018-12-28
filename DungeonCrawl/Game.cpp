@@ -34,6 +34,7 @@ EGameStatus Game::playGame()
 		{
 		case ETypeOfEncounter::Boss:
 			//execute code for boss room
+			dungeonRoom.bossRoom(player);
 			break;
 		case ETypeOfEncounter::Empty:
 			//execute code for empty room
@@ -143,8 +144,14 @@ void Dungeon::minionRoom(Player &p1)
 	//Player will always go first
 	Minion minion;	//minion spawned in the room
 	int userChoice;
-	cout << "You've encountered a minion!\n"
-		<< "\nWould you like to try to fight or run?\n"
+	cout << "You've encountered a minion!\n";
+
+	cout << "\t`oo.' \n"
+		<< "\t`-')  ,.\n"
+		<< "\t( `-'/^`\n"
+		<< "\t-`J-d   \n";
+
+	cout << "\nWould you like to try to fight or run?\n"
 		<< "1)Fight\n"
 		<< "2)Run\n";
 	//check that userChoice is valid
@@ -191,6 +198,92 @@ void Dungeon::minionRoom(Player &p1)
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
+	return;
+}
+
+void Dungeon::bossRoom(Player & p1)
+{
+	Boss boss;	//boss spawned in the room
+	int userChoice;
+	cout << "You've encountered a boss!\n";
+
+	cout << "\t                                                 /===-_---~~~~~~~~~------____\n"
+		<< "\t                                                |===-~___                _,-'\n"
+		<< "\t                 -==\\\\                         `//~\\\\   ~~~~`---.___.-~~\n"
+		<< "\t             ______-==|                         | |  \\\\           _-~`\n"
+		<< "\t       __--~~~  ,-/-==\\\\                        | |   `\\        ,'\n"
+		<< "\t    _-~       /'    |  \\\\                      / /      \\      /\n"
+		<< "\t  .'        /       |   \\\\                   /' /        \\   /'\n"
+		<< "\t /  ____  /         |    \\`\\.__/-~~ ~ \\ _ _/'  /          \\/'\n"
+		<< "\t/-'~    ~~~~~---__  |     ~-/~         ( )   /'        _--~`\n"
+		<< "\t                  \\_|      /        _)   ;  ),   __--~~\n"
+		<< "\t                    '~~--_/      _-~/-  / \\   '-~ \\\n"
+		<< "\t                   {\\__--_/}    / \\\\_>- )<__\\      \\\n"
+		<< "\t                   /'   (_/  _-~  | |__>--<__|      | \n"
+		<< "\t                  |0  0 _/) )-~     | |__>--<__|      |\n"
+		<< "\t                  / /~ ,_/       / /__>---<__/      |  \n"
+		<< "\t                 o o _//        /-~_>---<__-~      /\n"
+		<< "\t                 (^(~          /~_>---<__-      _-~              \n"
+		<< "\t                ,/|           /__>--<__/     _-~                 \n"
+		<< "\t             ,//('(          |__>--<__|     /                  .----_ \n"
+		<< "\t            ( ( '))          |__>--<__|    |                 /' _---_~\\\n"
+		<< "\t         `-)) )) (           |__>--<__|    |               /'  /     ~\\`\\ \n"
+		<< "\t        ,/,'//( (             \\__>--<__\\    \\            /'  //        ||\n"
+		<< "\t      ,( ( ((, ))              ~-__>--<_~-_  ~--____---~' _/'/        /'\n"
+		<< "\t    `~/  )` ) ,/|                 ~-_~>--<_/-__       __-~ _/ \n"
+		<< "\t  ._-~//( )/ )) `                    ~~-'_/_/ /~~~~~~~__--~ \n"
+		<< "\t   ;'( ')/ ,)(                              ~~~~~~~~~~ \n"
+		<< "\t  ' ') '( (/\n"
+		<< "\t    '   '  `   \n";
+
+
+	cout << "\nWould you like to try to fight or run?\n"
+		<< "1)Fight\n"
+		<< "2)Run\n";
+	//check that userChoice is valid
+	userChoice = intOneorTwo();	//this forces the user to type in a 1 or a 2 so I know userChoice is either a 1 or a 2 after that function
+	if (userChoice == 2)
+	{
+		//attempt to escape
+		bool hasEscaped = false;
+		hasEscaped = boss.isEscape();
+		if (hasEscaped == true)
+		{
+			return;
+		}
+	}
+	//else we fight
+	system("CLS");	//clears the screen
+	cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+	do
+	{
+		boss.setHealth(boss.getHealth() - p1.attack());	//player attacked the boss and updated health
+		if (boss.getHealth() <= 0)
+		{
+			boss.setAlive(false);
+		}
+		if (boss.getIsAlive() == false)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+			system("CLS");
+			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+			cout << "You defeated the boss!\n";
+			//TODO add loot
+			break;
+		}
+		//End of turn for player attacking boss
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+		p1.setHealth(p1.getHealth() - boss.attack());
+		if (p1.getHealth() <= 0)
+		{
+			p1.setAlive(false);
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and boss is alive, if one dies, fight is over
 	return;
 }
 
@@ -276,6 +369,7 @@ int Minion::attack()
 	return damage;	//minion can hit from 0-9
 }
 
+//Function returns true if the player sucefully escaped from the minion, 25% chance of escaping
 bool Minion::isEscape()
 {
 	//player will have a 25% chance of escaping any minion encounter
@@ -285,5 +379,68 @@ bool Minion::isEscape()
 		cout << "You have succefully escaped from the minion!\n\n";
 		return true;
 	}
+	cout << "The minion doesn't let you run away!\n";
+	std::this_thread::sleep_for(std::chrono::milliseconds(1200));	//the code that happens after this is a clear screen so this is needed to see the statement
+	return false;	//else return false because the player did not manage to escape
+}
+
+Boss::Boss()
+{
+	setHealth(85);
+	setAlive(true);
+	setAttackStat(25);
+	setStrengthStat(15);
+	setDefenceStat(5);
+}
+
+//Boss attack is just like any attack but has a 10% chance to burn the player and inflict high damage
+int Boss::attack()
+{
+	int damage = (rand() % getStrengthStat());
+	double rerollDmg = getStrengthStat() * 0.20;	//this is 20% of our max hit
+	int burnChance = (rand() % 10);
+	if (burnChance == 0)	//burn the player
+	{
+		cout << "The boss burns you with his mighty dragon fire!\n";
+		cout << "The boss deals: " << (damage + 20) << " damage!\n";
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+		return (damage + 20);
+	}
+	else if (damage < rerollDmg)	//else we don't burn the player and we check if we reroll the damage
+	{
+		int chance = (rand() % 100);
+		if (chance >= 0 && chance <= getAttackStat())	//this range is attackStat%
+		{
+			damage = (rand() % getStrengthStat());	//this still has the potential to be a weak or even worse hit but that's okay
+			cout << "The boss deals: " << damage << " damage!\n";
+			return damage;
+		}
+		else	//else we don't reroll
+		{
+			cout << "The boss deals: " << damage << " damage!\n";
+			return damage;
+		}
+	}
+	else	//else the damage is high enough to not need re-rolling
+	{
+		cout << "The boss deals: " << damage << " damage!\n";
+		return damage;
+	}
+
+	return damage;	//boss can hit from 0-14
+}
+
+//Function return true if the player sucefully escaped from the boss, 5% chance of escaping
+bool Boss::isEscape()
+{
+	//player will have a 5% chance of escaping any minion encounter
+	int chance = (rand() % 20);	//range is 0-19
+	if (chance == 0)
+	{
+		cout << "You have succefully escaped from the boss!\n\n";
+		return true;
+	}
+	cout << "The boss doesn't let you run away!\n";
+	std::this_thread::sleep_for(std::chrono::milliseconds(1200));	//the code that happens after this is a clear screen so this is needed to see the statement
 	return false;	//else return false because the player did not manage to escape
 }
