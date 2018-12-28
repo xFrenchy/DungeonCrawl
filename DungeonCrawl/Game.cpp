@@ -171,30 +171,24 @@ void Dungeon::minionRoom(Player &p1)
 	cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 	do
 	{
-		minion.setHealth(minion.getHealth() - p1.attack());	//player attacked the minion and updated health
-		if (minion.getHealth() <= 0)
+		minion.defend(p1.attack());	//player attacked the minion and updated health
+		if (minion.getIsAlive() == false)	//if the minion died
 		{
-			minion.setAlive(false);
-		}
-		if (minion.getIsAlive() == false)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+			std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 			cout << "You defeated the minion!\n";
 			//TODO add loot
 			break;
 		}
+
 		//End of turn for player attacking minion
-		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
-		p1.setHealth(p1.getHealth() - minion.attack());
-		if (p1.getHealth() <= 0)
-		{
-			p1.setAlive(false);
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+		p1.defend(minion.attack());	//minion attacks the player
+		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
@@ -257,30 +251,24 @@ void Dungeon::bossRoom(Player & p1)
 	cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 	do
 	{
-		boss.setHealth(boss.getHealth() - p1.attack());	//player attacked the boss and updated health
-		if (boss.getHealth() <= 0)
+		boss.defend(p1.attack());	//player attacked the boss and updated health
+		if (boss.getIsAlive() == false)	//if boss is dead
 		{
-			boss.setAlive(false);
-		}
-		if (boss.getIsAlive() == false)
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+			std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 			cout << "You defeated the boss!\n";
 			//TODO add loot
 			break;
 		}
+
 		//End of turn for player attacking boss
-		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
-		p1.setHealth(p1.getHealth() - boss.attack());
-		if (p1.getHealth() <= 0)
-		{
-			p1.setAlive(false);
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+		p1.defend(boss.attack());	//boss attacks player
+		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and boss is alive, if one dies, fight is over
@@ -312,19 +300,51 @@ int Player::attack()
 		if (chance >= 0 && chance <= attackStat)	//this range is attackStat%
 		{
 			damage = (rand() % strengthStat);	//this still has the potential to be a weak or even worse hit but that's okay
-			cout << "You deal: " << damage << " damage!\n";
+			//cout << "You deal: " << damage << " damage!\n";
 			return damage;
 		}
 		else	//else we don't reroll
 		{
-			cout << "You deal: " << damage << " damage!\n";
+			//cout << "You deal: " << damage << " damage!\n";
 			return damage;
 		}
 	}
 	else	//else the damage is high enough to not need re-rolling
 	{
-		cout << "You deal: " << damage << " damage!\n";
+		//cout << "You deal: " << damage << " damage!\n";
 		return damage;
+	}
+}
+
+//Player reacts to damage based off its defence stats
+void Player::defend(int damage)
+{
+	//Player defence will have a chance to reduce the incoming attack by a percentage
+	int ogDamage = damage;
+	int chanceToReduce = (rand() % 100);
+	if (chanceToReduce >= 0 && chanceToReduce <= defenceStat)	//The higher the defence stat, the higher range we cover to be able to reduce
+	{
+		//reduce the damage by 5% of the players defence stats
+		double reducedDmg = damage * 0.05;
+		damage -= reducedDmg;
+		//now update the player's health
+		cout << "You take: " << damage << " damage!(reduced) from " << ogDamage << "\n";
+		health -= damage;	//updated player health
+		if (health <= 0)
+		{
+			isAlive = false;
+		}
+		return;
+	}
+	else	//else we don't reduce the damage
+	{
+		cout << "You take: " << damage << " damage!\n";
+		health -= damage;
+		if (health <= 0)
+		{
+			isAlive = false;
+		}
+		return;
 	}
 }
 
@@ -351,23 +371,53 @@ int Minion::attack()
 		if (chance >= 0 && chance <= getAttackStat())	//this range is attackStat%
 		{
 			damage = (rand() % getStrengthStat());	//this still has the potential to be a weak or even worse hit but that's okay
-			cout << "The minion deals: " << damage << " damage!\n";
+			//cout << "The minion deals: " << damage << " damage!\n";
 			return damage;
 		}
 		else	//else we don't reroll
 		{
-			cout << "The minion deals: " << damage << " damage!\n";
+			//cout << "The minion deals: " << damage << " damage!\n";
 			return damage;
 		}
 	}
 	else	//else the damage is high enough to not need re-rolling
 	{
-		cout << "The minion deals: " << damage << " damage!\n";
+		//cout << "The minion deals: " << damage << " damage!\n";
 		return damage;
 	}
 	
 	return damage;	//minion can hit from 0-9
 }
+
+/*void Minion::defend(int damage)
+{
+	//Minion defence will have a chance to reduce the incoming attack by a percentage
+	int chanceToReduce = (rand() % 100);
+	if (chanceToReduce >= 0 && chanceToReduce <= getDefenceStat())	//The higher the defence stat, the higher range we cover to be able to reduce
+	{
+		//reduce the damage by 5% of the minion defence stats
+		double reducedDmg = damage * 0.05;
+		damage -= reducedDmg;
+		//now update the minion's health
+		cout << "The minion takes: " << damage << "damage!(reduced)\n";
+		setHealth(getHealth() - damage);	//updated minion health
+		if (getHealth() <= 0)
+		{
+			setAlive(false);
+		}
+		return;
+	}
+	else	//else we don't reduce the damage
+	{
+		cout << "The minion takes: " << damage << "damage!\n";
+		setHealth(getHealth() - damage);	//updated minion health
+		if (getHealth() <= 0)
+		{
+			setAlive(false);
+		}
+		return;
+	}
+}*/
 
 //Function returns true if the player sucefully escaped from the minion, 25% chance of escaping
 bool Minion::isEscape()
@@ -402,7 +452,7 @@ int Boss::attack()
 	if (burnChance == 0)	//burn the player
 	{
 		cout << "The boss burns you with his mighty dragon fire!\n";
-		cout << "The boss deals: " << (damage + 20) << " damage!\n";
+		//cout << "The boss deals: " << (damage + 20) << " damage!\n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 		return (damage + 20);
 	}
@@ -412,18 +462,18 @@ int Boss::attack()
 		if (chance >= 0 && chance <= getAttackStat())	//this range is attackStat%
 		{
 			damage = (rand() % getStrengthStat());	//this still has the potential to be a weak or even worse hit but that's okay
-			cout << "The boss deals: " << damage << " damage!\n";
+			//cout << "The boss deals: " << damage << " damage!\n";
 			return damage;
 		}
 		else	//else we don't reroll
 		{
-			cout << "The boss deals: " << damage << " damage!\n";
+			//cout << "The boss deals: " << damage << " damage!\n";
 			return damage;
 		}
 	}
 	else	//else the damage is high enough to not need re-rolling
 	{
-		cout << "The boss deals: " << damage << " damage!\n";
+		//cout << "The boss deals: " << damage << " damage!\n";
 		return damage;
 	}
 
@@ -443,4 +493,35 @@ bool Boss::isEscape()
 	cout << "The boss doesn't let you run away!\n";
 	std::this_thread::sleep_for(std::chrono::milliseconds(1200));	//the code that happens after this is a clear screen so this is needed to see the statement
 	return false;	//else return false because the player did not manage to escape
+}
+
+void Monster::defend(int damage)
+{
+	//Monster defence will have a chance to reduce the incoming attack by a percentage
+	int ogDamage = damage;
+	int chanceToReduce = (rand() % 100);
+	if (chanceToReduce >= 0 && chanceToReduce <= defenceStat)	//The higher the defence stat, the higher range we cover to be able to reduce
+	{
+		//reduce the damage by 5% of the monsters defence stats
+		double reducedDmg = damage * 0.05;
+		damage -= reducedDmg;
+		//now update the monsters's health
+		cout << "You deal: " << damage << " damage!(reduced) from " << ogDamage << "\n";
+		health -= damage;	//updated monsters health
+		if (health <= 0)
+		{
+			isAlive = false;
+		}
+		return;
+	}
+	else	//else we don't reduce the damage
+	{
+		cout << "You deal: " << damage << " damage!\n";
+		health -= damage;
+		if (health <= 0)
+		{
+			isAlive = false;
+		}
+		return;
+	}
 }
