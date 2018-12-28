@@ -160,7 +160,6 @@ void Dungeon::minionRoom(Player &p1)
 		}
 	}
 	//else we fight
-	//TODO execute fight
 	system("CLS");	//clears the screen
 	cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 	do
@@ -172,25 +171,25 @@ void Dungeon::minionRoom(Player &p1)
 		}
 		if (minion.getIsAlive() == false)
 		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 			cout << "You defeated the minion!\n";
+			//TODO add loot
 			break;
 		}
 		//End of turn for player attacking minion
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
-		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-
 		p1.setHealth(p1.getHealth() - minion.attack());
 		if (p1.getHealth() <= 0)
 		{
 			p1.setAlive(false);
 		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
-		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
 	return;
 }
@@ -199,19 +198,50 @@ Player::Player()
 {
 	health = 100;
 	isAlive = true;
+	attackStat = 15;
+	strengthStat = 15;
+	defenceStat = 15;
 }
 
 int Player::attack()
 {
 	//Player's attack will vary only based on the stats the player has
 	//TODO implement stats to affect player attacks
-	return (rand() % 16);	//default range is between 0-15
+	//attack will be accuracy
+	//strength is max hit
+
+	//for accuracy, if the roll is less than 20% of our max hit, we have a (attackStat)% chance of re-rolling for another hit
+	int damage = (rand() % strengthStat);
+	double rerollDmg = strengthStat * 0.20;	//this is 20% of our max hit
+	if (damage < rerollDmg)
+	{
+		int chance = (rand() % 100);
+		if (chance >= 0 && chance <= attackStat)	//this range is attackStat%
+		{
+			damage = (rand() % strengthStat);	//this still has the potential to be a weak or even worse hit but that's okay
+			cout << "You deal: " << damage << " damage!\n";
+			return damage;
+		}
+		else	//else we don't reroll
+		{
+			cout << "You deal: " << damage << " damage!\n";
+			return damage;
+		}
+	}
+	else	//else the damage is high enough to not need re-rolling
+	{
+		cout << "You deal: " << damage << " damage!\n";
+		return damage;
+	}
 }
 
 Minion::Minion()
 {
 	setHealth(20);
 	setAlive(true);
+	setAttackStat(7);
+	setStrengthStat(10);
+	setDefenceStat(7);
 }
 
 int Minion::attack()
@@ -219,7 +249,31 @@ int Minion::attack()
 	//A minion should hit low and should never be able to kill the player unless the player was low to begin with
 	//A minion should be a slight annoyance with potential to have ok loot to compensate for
 	//TODO make a more rich attack
-	return (rand() % 11);	//minion can hit from 0-10
+
+	int damage = (rand() % getStrengthStat());
+	double rerollDmg = getStrengthStat() * 0.20;	//this is 20% of our max hit
+	if (damage < rerollDmg)
+	{
+		int chance = (rand() % 100);
+		if (chance >= 0 && chance <= getAttackStat())	//this range is attackStat%
+		{
+			damage = (rand() % getStrengthStat());	//this still has the potential to be a weak or even worse hit but that's okay
+			cout << "The minion deals: " << damage << " damage!\n";
+			return damage;
+		}
+		else	//else we don't reroll
+		{
+			cout << "The minion deals: " << damage << " damage!\n";
+			return damage;
+		}
+	}
+	else	//else the damage is high enough to not need re-rolling
+	{
+		cout << "The minion deals: " << damage << " damage!\n";
+		return damage;
+	}
+	
+	return damage;	//minion can hit from 0-9
 }
 
 bool Minion::isEscape()
