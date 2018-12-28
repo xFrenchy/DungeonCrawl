@@ -6,6 +6,7 @@
 #include <chrono>	//chrone::seconds
 
 using std::cout;
+using std::cin;
 
 void displayIntro()
 {
@@ -22,7 +23,7 @@ EGameStatus askToPlayGame()
 {
 	cout << "Would you like to play?<Y/N>";
 	char answer;
-	std::cin >> answer;
+	cin >> answer;
 	answer = toupper(answer);
 	if (answer == 'Y')
 	{
@@ -35,8 +36,8 @@ EGameStatus askToPlayGame()
 	else
 	{
 		cout << "Invalid answer, try again\n";
-		std::cin.ignore(255, '\n');
-		std::cin.clear();
+		cin.ignore(255, '\n');
+		cin.clear();
 		return EGameStatus::Invalid_guess;
 	}
 }
@@ -61,9 +62,43 @@ bool isValidYesNo(char letter)
 	else
 	{
 		cout << "Invalid answer, try again\n";
-		std::cin.ignore(255, '\n');
-		std::cin.clear();
+		cin.ignore(255, '\n');
+		cin.clear();
 		return false;
 	}
 	return false;
+}
+
+int intOneorTwo()
+{
+	int choice;
+	bool valid = false;
+	do
+	{
+		cin >> choice;
+		if (cin.fail())	//if cin was not an int
+		{
+			cout << "That was not an int!\n";
+			cin.ignore(255, '\n');
+			cin.clear();
+		}
+		//else the input was an int
+		if (choice == 1)
+		{
+			valid = true;
+			return choice;
+		}
+		else if (choice == 2)
+		{
+			valid = true;
+			return choice;
+		}
+		else
+		{
+			cout << "Invalid number! You must choose 1 or 2, try again\n";
+			valid = false;
+		}
+	} while (valid == false);
+
+	return choice;
 }
