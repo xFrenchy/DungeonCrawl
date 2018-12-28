@@ -46,6 +46,7 @@ public:
 	int getDefenceStat() { return defenceStat; }
 	
 	int attack();
+	void defend(int damage);
 };
 
 
@@ -72,6 +73,7 @@ public:
 	int getDefenceStat() { return defenceStat; }
 
 	virtual int attack() = 0;
+	void defend(int damage);
 	virtual bool isEscape() = 0;
 };
 
