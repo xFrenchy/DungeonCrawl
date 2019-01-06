@@ -2,6 +2,9 @@
 #ifndef GAMES_H
 #define GAMES_H
 
+#include <vector>
+#include <string>
+
 const int amountOfEncounterTypes = 5;
 
 
@@ -31,6 +34,7 @@ private:
 	int attackStat;
 	int strengthStat;
 	int defenceStat;
+	std::vector<std::string> inventory;
 public:
 	Player();
 	void setHealth(int _health) { health = _health; }
@@ -47,6 +51,8 @@ public:
 	
 	int attack();
 	void defend(int damage);
+	void addItem(std::string);
+	void increaseStat(std::string);
 };
 
 
@@ -113,6 +119,7 @@ public:
 	void emptyRoom();
 	void minionRoom(Player &p1);
 	void bossRoom(Player &p1);
+	void treasureRoom(Player &p1);
 };
 
 
