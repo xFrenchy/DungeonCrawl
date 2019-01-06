@@ -49,6 +49,7 @@ EGameStatus Game::playGame()
 			break;
 		case ETypeOfEncounter::Treasure:
 			//execute code for treasure room
+			dungeonRoom.treasureRoom(player);
 			break;
 		default:
 			cout << "A non recognizable encouter happened, this is an error!\n";
@@ -275,6 +276,41 @@ void Dungeon::bossRoom(Player & p1)
 	return;
 }
 
+//Player steps into room and has their inventory filled with random treasure items
+void Dungeon::treasureRoom(Player & p1)
+{
+	//create an array of treasures
+	std::string treasuresGold[] = { "25 gold", "50 gold", "100 gold", "250 gold", "500 gold", "1000 gold" };	//6 items
+	std::string treasureStatBoost[] = {"+1 Attack", "+3 Attack", "+5 Attack", "+1 Strength", "+3 Strength", "+5 Strength", "+1 Defence", "+3 Defence", "+5 Defence" };	//9 items
+	std::string treasureFood[] = {"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"};	//5 items
+	//fish is +5 health, lobster is +10, Minion meat is +15, Shark is +20, Dragon meat is +25
+	//randomly choose an array of treasure 5 times, for each drop table landed on, only pick 1 item randomly from it and add it to the player's inventory
+	for (int i = 0; i < 5; i++)
+	{
+		int randomNum = rand() % 3;
+		if (randomNum == 0)	//land in the gold drop table
+		{
+			randomNum = rand() % 6;
+			p1.addItem(treasuresGold[randomNum]);
+		}
+		else if (randomNum == 1)	//land in the stat boost drop table
+		{
+			randomNum = rand() % 9;
+			p1.increaseStat(treasureStatBoost[randomNum]);
+			
+		}
+		else if (randomNum == 2)	//land in the food drop table
+		{
+			randomNum = rand() % 5;
+			p1.addItem(treasureFood[randomNum]);
+		}
+		else
+		{
+			cout << "Error generating correct number to land on drop table!\n";
+		}
+	}
+}
+
 Player::Player()
 {
 	health = 100;
@@ -346,6 +382,54 @@ void Player::defend(int damage)
 		}
 		return;
 	}
+}
+
+//Adds an item to the player's inventory
+void Player::addItem(std::string item)
+{
+	//TODO look into creating stack so objects aka if there is a shark in the player's iventory, make it display 2x sharks into of shark shark
+	cout << "You recieved: " << item << "!\n";
+	inventory.push_back(item);
+}
+
+//Takes in a boost and applies it to the player
+void Player::increaseStat(std::string stat)
+{
+	//http://www.cplusplus.com/reference/string/string/find/
+	std::string attackStr = "Attack";
+	std::string strengthStr = "Strength";
+	std::string defenceStr = "Defence";
+
+	cout << "Your recieved a stat buff: " << stat << "!\n";
+
+	std::size_t found = stat.find(attackStr);
+	if (found != std::string::npos)	//if this is true, attack has been found and we apply the buff to attack
+	{
+		//in the string, the 1 spot is going to hold the number
+		char number = stat[1];
+		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
+		attackStat += buff;	//buff has been applied
+		return;
+	}
+	found = stat.find(strengthStr);
+	if (found != std::string::npos)	//if this is true, strength has been found and we apply the buff to attack
+	{
+		//in the string, the 1 spot is going to hold the number
+		char number = stat[1];
+		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
+		strengthStat += buff;	//buff has been applied
+		return;
+	}
+	found = stat.find(defenceStr);
+	if (found != std::string::npos)	//if this is true, strength has been found and we apply the buff to attack
+	{
+		//in the string, the 1 spot is going to hold the number
+		char number = stat[1];
+		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
+		defenceStat += buff;	//buff has been applied
+		return;
+	}
+	return;
 }
 
 Minion::Minion()
