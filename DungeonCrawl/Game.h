@@ -2,6 +2,7 @@
 #ifndef GAMES_H
 #define GAMES_H
 
+#include "Items.h"
 #include <vector>
 #include <string>
 
@@ -31,6 +32,7 @@ class Player
 private:
 	int health;
 	bool isAlive;
+	int gold;
 	int attackStat;
 	int strengthStat;
 	int defenceStat;
@@ -38,13 +40,15 @@ private:
 public:
 	Player();
 	void setHealth(int _health) { health = _health; }
-	void setAlive(bool _isAlive) { isAlive = _isAlive; }
+	void setAlive(bool _isAlive) { isAlive = _isAlive; }\
+	void setGold(int _gold) { gold = _gold; }
 	void setAttackStat(int _attackStat) { attackStat = _attackStat; }
 	void setStrengthStat(int _strengthStat) { strengthStat = _strengthStat; }
 	void setDefenceStat(int _defenceStat) { defenceStat = _defenceStat; }
 
 	int getHealth() { return health; }
 	bool getIsAlive() { return isAlive; }
+	int getGold() { return gold; }
 	int getAttackStat() { return attackStat; }
 	int getStrengthStat() { return strengthStat; }
 	int getDefenceStat() { return defenceStat; }
@@ -53,6 +57,9 @@ public:
 	void defend(int damage);
 	void addItem(std::string);
 	void increaseStat(std::string);
+	void displayStat();
+	void showAndUseInv();
+	void useItem(std::string);
 };
 
 
@@ -142,6 +149,7 @@ public:
 	int getCurrentRoomNumber() { return currentRoomNumber; }
 
 	EGameStatus playGame();
+	void showEndStats();
 };
 
 
