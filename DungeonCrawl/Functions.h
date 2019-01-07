@@ -5,4 +5,5 @@ void displayIntro();
 EGameStatus askToPlayGame();
 void gameOver();
 bool isValidYesNo(char);
+bool isValidYNSI(char);
 int intOneorTwo();
