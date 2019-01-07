@@ -13,7 +13,7 @@ using std::cin;
 Game::Game()
 {
 	gameOver = false;
-	maxRooms = 5;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
+	maxRooms = 50;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
 	currentRoomNumber = 1;
 }
 
@@ -69,8 +69,8 @@ EGameStatus Game::playGame()
 			//prompt the user if they would like to move forward or show stats
 			if (currentRoomNumber == maxRooms)	//Move the user forward automatically since they won
 			{
-				currentRoomNumber++;
-				return EGameStatus::Move_forward;
+				//currentRoomNumber++;
+				return EGameStatus::User_won;
 			}
 			bool moveForward = false;
 			while (moveForward == false)
@@ -107,7 +107,7 @@ EGameStatus Game::playGame()
 			}
 		}
 	}
-	else	//else we have gone through every single room
+	else	//else we have gone through every single room, this should never execute
 	{
 		cout << "You have reached the end!\n\t#############\n\tYOU WON!\n\t#############\n\n";
 		return EGameStatus::EndGame;
@@ -121,6 +121,7 @@ void Game::showEndStats()
 	cout << "Your adventures are over, here are the stats you ended with";
 	player.displayStat();
 	cout << "Gold: " << player.getGold() << "\n";
+	cout << "Last room: " << currentRoomNumber << "\n";
 }
 
 Dungeon::Dungeon()
@@ -292,6 +293,14 @@ void Dungeon::bossRoom(Player &p1)
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 			cout << "You defeated the boss!\n";
 			//TODO add loot
+			cout << "You recieved 200 gold!\n";
+			p1.setGold(p1.getGold() + 200);
+			std::string loot[] = { "Dragon Meat" };	//expand on this later
+			int lootChance = rand() % 2;	//0 or 1
+			if (lootChance == 0)
+			{
+				p1.addItem("Dragon Meat");
+			}
 			break;
 		}
 
@@ -357,15 +366,12 @@ void Dungeon::shopRoom(Player &p1)
 	do
 	{
 		cout << "Merchant's Store:\t\tYour gold: "<< p1.getGold() << "\n"
-			<< "1. Fish (50 gold)\n"
+			<< "1. Fish (20 gold)\n"
 			<< "2. Shark (100 gold)\n"
-			<< "3. +1 Attack (75 gold)\n"
-			<< "4. +3 Attack (140 gold)\n"
-			<< "5. +1 Strength (75 gold)\n"
-			<< "6. +3 Strength (140 gold)\n"
-			<< "7. +1 Defence (75 gold)\n"
-			<< "8. +3 Defence (140 gold)\n"
-			<< "9. Full Heal (120 gold)\n"
+			<< "3. +1 Attack (200 gold)\n"
+			<< "4. +1 Strength (200 gold)\n"
+			<< "5. +1 Defence (200 gold)\n"
+			<< "6. Full Heal (120 gold)\n"
 			<< "0. Exit shop\n";
 		cin >> choice;
 		if (cin.fail())	//if it fails, it's not an int
@@ -375,7 +381,7 @@ void Dungeon::shopRoom(Player &p1)
 			cin.ignore(255, '\n');
 			exit = false;
 		}
-		else if (choice < 0 || choice > 9)
+		else if (choice < 0 || choice > 6)
 		{
 			cout << "That option is out of range!\n";
 		}
@@ -384,9 +390,9 @@ void Dungeon::shopRoom(Player &p1)
 			switch (choice)
 			{
 			case 1:	//purchase Fish
-				if (p1.getGold() >= 50)
+				if (p1.getGold() >= 20)
 				{
-					p1.setGold(p1.getGold() - 50);
+					p1.setGold(p1.getGold() - 20);
 					p1.addItem("Fish");
 				}
 				else	//not enough gold
@@ -406,9 +412,9 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 3:	//+1 attack
-				if (p1.getGold() >= 75)
+				if (p1.getGold() >= 200)
 				{
-					p1.setGold(p1.getGold() - 75);
+					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Attack");
 				}
 				else	//not enough gold
@@ -416,21 +422,10 @@ void Dungeon::shopRoom(Player &p1)
 					cout << "Not enough gold to purchase this item!\n";
 				}
 				break;
-			case 4:	//+3 att
-				if (p1.getGold() >= 140)
+			case 4:	//+1 str
+				if (p1.getGold() >= 200)
 				{
-					p1.setGold(p1.getGold() - 140);
-					p1.increaseStat("+3 Attack");
-				}
-				else	//not enough gold
-				{
-					cout << "Not enough gold to purchase this item!\n";
-				}
-				break;
-			case 5:	//+1 str
-				if (p1.getGold() >= 75)
-				{
-					p1.setGold(p1.getGold() - 75);
+					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Strength");
 				}
 				else	//not enough gold
@@ -438,21 +433,10 @@ void Dungeon::shopRoom(Player &p1)
 					cout << "Not enough gold to purchase this item!\n";
 				}
 				break;
-			case 6:	//+3 str
-				if (p1.getGold() >= 140)
+			case 5:	//+1 def
+				if (p1.getGold() >= 200)
 				{
-					p1.setGold(p1.getGold() - 140);
-					p1.increaseStat("+3 Strength");
-				}
-				else	//not enough gold
-				{
-					cout << "Not enough gold to purchase this item!\n";
-				}
-				break;
-			case 7:	//+1 def
-				if (p1.getGold() >= 75)
-				{
-					p1.setGold(p1.getGold() - 75);
+					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Defence");
 				}
 				else	//not enough gold
@@ -460,18 +444,7 @@ void Dungeon::shopRoom(Player &p1)
 					cout << "Not enough gold to purchase this item!\n";
 				}
 				break;
-			case 8:	//+3 def
-				if (p1.getGold() >= 140)
-				{
-					p1.setGold(p1.getGold() - 140);
-					p1.increaseStat("+3 Defence");
-				}
-				else	//not enough gold
-				{
-					cout << "Not enough gold to purchase this item!\n";
-				}
-				break;
-			case 9:	//full heal
+			case 6:	//full heal
 				if (p1.getGold() >= 120)
 				{
 					p1.setGold(p1.getGold() - 120);
@@ -642,7 +615,12 @@ void Player::showAndUseInv()
 	{
 		cin >> answer;
 		if (answer < 0 || answer > inventory.size())
+		{
+			cout << "Invalid option!\n";
+			cin.clear();
+			cin.ignore(255, '\n');
 			valid = false;
+		}
 		else
 			valid = true;
 	} while (valid == false);
