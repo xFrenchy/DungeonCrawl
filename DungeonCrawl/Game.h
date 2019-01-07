@@ -127,6 +127,7 @@ public:
 	void minionRoom(Player &p1);
 	void bossRoom(Player &p1);
 	void treasureRoom(Player &p1);
+	void shopRoom(Player &p1);
 };
 
 

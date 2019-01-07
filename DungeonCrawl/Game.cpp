@@ -47,6 +47,7 @@ EGameStatus Game::playGame()
 			break;
 		case ETypeOfEncounter::Shop:
 			//execute code for shop room
+			dungeonRoom.shopRoom(player);
 			break;
 		case ETypeOfEncounter::Treasure:
 			//execute code for treasure room
@@ -227,7 +228,7 @@ void Dungeon::minionRoom(Player &p1)
 	return;
 }
 
-void Dungeon::bossRoom(Player & p1)
+void Dungeon::bossRoom(Player &p1)
 {
 	Boss boss;	//boss spawned in the room
 	int userChoice;
@@ -308,8 +309,10 @@ void Dungeon::bossRoom(Player & p1)
 }
 
 //Player steps into room and has their inventory filled with random treasure items
-void Dungeon::treasureRoom(Player & p1)
+void Dungeon::treasureRoom(Player &p1)
 {
+	cout << "You found the treasure room!\n";
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	//create an array of treasures
 	int treasuresGold[] = { 25, 50, 100, 250, 500, 1000};	//6 items
 	std::string treasureStatBoost[] = {"+1 Attack", "+3 Attack", "+5 Attack", "+1 Strength", "+3 Strength", "+5 Strength", "+1 Defence", "+3 Defence", "+5 Defence" };	//9 items
@@ -342,6 +345,155 @@ void Dungeon::treasureRoom(Player & p1)
 			cout << "Error generating correct number to land on drop table!\n";
 		}
 	}
+}
+
+//Player steps into room and is prompted with a shop, player can buy items if they have enough gold and can buy as many items as they want
+void Dungeon::shopRoom(Player &p1)
+{
+	cout << "You found the shop room!A merchant has been awaiting for your arrival\n";
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	bool exit = false;
+	int choice;
+	do
+	{
+		cout << "Merchant's Store:\t\tYour gold: "<< p1.getGold() << "\n"
+			<< "1. Fish (50 gold)\n"
+			<< "2. Shark (100 gold)\n"
+			<< "3. +1 Attack (75 gold)\n"
+			<< "4. +3 Attack (140 gold)\n"
+			<< "5. +1 Strength (75 gold)\n"
+			<< "6. +3 Strength (140 gold)\n"
+			<< "7. +1 Defence (75 gold)\n"
+			<< "8. +3 Defence (140 gold)\n"
+			<< "9. Full Heal (120 gold)\n"
+			<< "0. Exit shop\n";
+		cin >> choice;
+		if (cin.fail())	//if it fails, it's not an int
+		{
+			cout << "That wasn't an int! Try typing a number to choose what to buy\n";
+			cin.clear();
+			cin.ignore(255, '\n');
+			exit = false;
+		}
+		else if (choice < 0 || choice > 9)
+		{
+			cout << "That option is out of range!\n";
+		}
+		else	//else it's a valid option
+		{
+			switch (choice)
+			{
+			case 1:	//purchase Fish
+				if (p1.getGold() >= 50)
+				{
+					p1.setGold(p1.getGold() - 50);
+					p1.addItem("Fish");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 2:	//purchase Shark
+				if (p1.getGold() >= 100)
+				{
+					p1.setGold(p1.getGold() - 100);
+					p1.addItem("Shark");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 3:	//+1 attack
+				if (p1.getGold() >= 75)
+				{
+					p1.setGold(p1.getGold() - 75);
+					p1.increaseStat("+1 Attack");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 4:	//+3 att
+				if (p1.getGold() >= 140)
+				{
+					p1.setGold(p1.getGold() - 140);
+					p1.increaseStat("+3 Attack");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 5:	//+1 str
+				if (p1.getGold() >= 75)
+				{
+					p1.setGold(p1.getGold() - 75);
+					p1.increaseStat("+1 Strength");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 6:	//+3 str
+				if (p1.getGold() >= 140)
+				{
+					p1.setGold(p1.getGold() - 140);
+					p1.increaseStat("+3 Strength");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 7:	//+1 def
+				if (p1.getGold() >= 75)
+				{
+					p1.setGold(p1.getGold() - 75);
+					p1.increaseStat("+1 Defence");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 8:	//+3 def
+				if (p1.getGold() >= 140)
+				{
+					p1.setGold(p1.getGold() - 140);
+					p1.increaseStat("+3 Defence");
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 9:	//full heal
+				if (p1.getGold() >= 120)
+				{
+					p1.setGold(p1.getGold() - 120);
+					p1.setHealth(100);
+				}
+				else	//not enough gold
+				{
+					cout << "Not enough gold to purchase this item!\n";
+				}
+				break;
+			case 0:	//exit
+				exit = true;
+				break;
+			default:
+				cout << "Try again\n";
+				break;
+			}
+		}
+	} while (exit == false);
+
+	cout << "Thanks for visiting!\n";
+	return;
 }
 
 Player::Player()
