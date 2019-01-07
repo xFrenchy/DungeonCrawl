@@ -22,4 +22,6 @@ Things not implemented so far:
 
 -User interaction with their inventory during combat
 
--Shop
+-Unlimited rooms
+
+-Gear
