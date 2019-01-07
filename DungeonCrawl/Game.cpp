@@ -119,6 +119,7 @@ void Game::showEndStats()
 {
 	cout << "Your adventures are over, here are the stats you ended with";
 	player.displayStat();
+	cout << "Gold: " << player.getGold() << "\n";
 }
 
 Dungeon::Dungeon()
@@ -201,7 +202,15 @@ void Dungeon::minionRoom(Player &p1)
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 			cout << "You defeated the minion!\n";
-			//TODO add loot
+			//TODO add better loot
+			cout << "You recieved 50 gold!\n";
+			p1.setGold(p1.getGold() + 50);
+			std::string loot[] = { "Minion Meat" };	//expand on this later
+			int lootChance = rand() % 2;	//0 or 1
+			if (lootChance == 0)
+			{
+				p1.addItem("Minion Meat");
+			}
 			break;
 		}
 
