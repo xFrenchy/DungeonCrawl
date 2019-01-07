@@ -14,7 +14,8 @@ enum class EGameStatus
 	Invalid_guess,
 	Play,
 	EndGame,
-	Move_forward
+	Move_forward,
+	User_won
 };
 
 enum class ETypeOfEncounter
