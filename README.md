@@ -20,6 +20,6 @@ once the end of the dungeon is reached, game is over
 
 Things not implemented so far:
 
--User interaction with their inventory
+-User interaction with their inventory during combat
 
 -Shop
