@@ -445,10 +445,10 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 6:	//full heal
-				if (p1.getGold() >= 120)
+				if (p1.getGold() >= 120 && p1.getHealth() < 120)
 				{
 					p1.setGold(p1.getGold() - 120);
-					p1.setHealth(100);
+					p1.setHealth(120);
 				}
 				else	//not enough gold
 				{
@@ -519,11 +519,13 @@ void Player::defend(int damage)
 	int chanceToReduce = (rand() % 100);
 	if (chanceToReduce >= 0 && chanceToReduce <= defenceStat)	//The higher the defence stat, the higher range we cover to be able to reduce
 	{
-		//reduce the damage by 5% of the players defence stats
-		double reducedDmg = damage * 0.05;
+		//reduce the damage by 1% of the player's defence stat
+		double reducedDmg = defenceStat * 0.1;
 		damage -= reducedDmg;
+		if (damage < 0)
+			damage = 0;
 		//now update the player's health
-		cout << "You take: " << damage << " damage!(reduced) from " << ogDamage << "\n";
+		cout << "You take: " << damage << " damage!(reduced by " << (int)reducedDmg+1 << ") from " << ogDamage << "\n";//the +1 is needed since it's rounded up
 		health -= damage;	//updated player health
 		if (health <= 0)
 		{
@@ -632,12 +634,20 @@ void Player::showAndUseInv()
 	}
 	else
 	{
-		std::string item = inventory[answer-1];
-		//delete item from inventory and shift everything over
-		//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
-		inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
-		useItem(item);
-		return;
+		if (health >= 120)
+		{
+			cout << "You're health is already at 120 or above! You cannot eat anymore food!\n";
+			return;
+		}
+		else
+		{
+			std::string item = inventory[answer - 1];
+			//delete item from inventory and shift everything over
+			//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
+			inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
+			useItem(item);
+			return;
+		}
 	}
 }
 
@@ -807,11 +817,13 @@ void Monster::defend(int damage)
 	int chanceToReduce = (rand() % 100);
 	if (chanceToReduce >= 0 && chanceToReduce <= defenceStat)	//The higher the defence stat, the higher range we cover to be able to reduce
 	{
-		//reduce the damage by 5% of the monsters defence stats
-		double reducedDmg = damage * 0.05;
+		//reduce the damage by 1% of the monster's defence stat
+		double reducedDmg = defenceStat * 0.1;
 		damage -= reducedDmg;
+		if (damage < 0)
+			damage = 0;
 		//now update the monsters's health
-		cout << "You deal: " << damage << " damage!(reduced) from " << ogDamage << "\n";
+		cout << "You deal: " << damage << " damage!(reduced by " << (int)reducedDmg+1 << ") from " << ogDamage << "\n";	//the +1 is needed since it's rounded up
 		health -= damage;	//updated monsters health
 		if (health <= 0)
 		{
