@@ -3,7 +3,7 @@
 
 void displayIntro();
 EGameStatus askToPlayGame();
-void gameOver();
+void gameOver(EGameStatus);
 bool isValidYesNo(char);
 bool isValidYNSI(char);
 int intOneorTwo();

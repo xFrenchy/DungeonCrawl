@@ -43,9 +43,16 @@ EGameStatus askToPlayGame()
 }
 
 //displays a game over message and pauses for 1 second
-void gameOver()
+void gameOver(EGameStatus status)
 {
-	std::cout << "Game over!\n";
+	if (status == EGameStatus::User_won)
+	{
+		cout << "Congratulations! You won!\n";
+	}
+	else
+	{
+		std::cout << "Game over!\n";
+	}
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
