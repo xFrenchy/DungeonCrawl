@@ -42,6 +42,7 @@ EGameStatus askToPlayGame()
 	}
 }
 
+//displays a game over message and pauses for 1 second
 void gameOver()
 {
 	std::cout << "Game over!\n";
@@ -59,6 +60,23 @@ bool isValidYesNo(char letter)
 	{
 		return true;
 	}
+	else
+	{
+		cout << "Invalid answer, try again\n";
+		cin.ignore(255, '\n');
+		cin.clear();
+		return false;
+	}
+	return false;
+}
+
+bool isValidYNSI(char answer)
+{
+	answer = toupper(answer);
+	if (answer == 'Y'){return true;}
+	else if (answer == 'N'){return true;}
+	else if (answer == 'S'){return true;}
+	else if (answer == 'I'){return true;}
 	else
 	{
 		cout << "Invalid answer, try again\n";
