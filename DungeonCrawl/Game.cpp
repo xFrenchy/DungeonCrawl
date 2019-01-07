@@ -8,6 +8,7 @@
 #include <stdlib.h>	//clear screan system("CLS")
 
 using std::cout;
+using std::cin;
 
 Game::Game()
 {
@@ -64,30 +65,44 @@ EGameStatus Game::playGame()
 		}
 		else	//else we move forward
 		{
-			//prompt the user if they would like to move forward
+			//prompt the user if they would like to move forward or show stats
 			if (currentRoomNumber == maxRooms)	//Move the user forward automatically since they won
 			{
 				currentRoomNumber++;
 				return EGameStatus::Move_forward;
 			}
-			cout << "Would you like to move on to the next room?<Y/N>";
-			bool valid = false;
-			char answer = ' ';
-			do
+			bool moveForward = false;
+			while (moveForward == false)
 			{
-				std::cin >> answer;
-				answer = toupper(answer);
-				valid = isValidYesNo(answer);
-			} while (valid == false);
-			//once outside the loop we know the answer types a yes or a no
-			if (answer == 'Y')
-			{
-				currentRoomNumber++;
-				return EGameStatus::Move_forward;
-			}
-			else if (answer == 'N')
-			{
-				return EGameStatus::EndGame;
+				cout << "Y- Proceed to next room\nN- End game\nS- Show stats\nI- Show and use inventory\n";
+				bool valid = false;
+				char answer = ' ';
+				do
+				{
+					std::cin >> answer;
+					answer = toupper(answer);
+					valid = isValidYNSI(answer);
+				} while (valid == false);
+				//once outside the loop we know the answer types a yes or a no
+				if (answer == 'Y')
+				{
+					currentRoomNumber++;
+					return EGameStatus::Move_forward;
+				}
+				else if (answer == 'N')
+				{
+					return EGameStatus::EndGame;
+				}
+				else if (answer == 'S')
+				{
+					player.displayStat();
+					moveForward = false;
+				}
+				else if (answer == 'I')
+				{
+					player.showAndUseInv();
+					moveForward = false;
+				}
 			}
 		}
 	}
@@ -97,6 +112,13 @@ EGameStatus Game::playGame()
 		return EGameStatus::EndGame;
 	}
 
+}
+
+//displays player ending health, attack, strength, defence
+void Game::showEndStats()
+{
+	cout << "Your adventures are over, here are the stats you ended with";
+	player.displayStat();
 }
 
 Dungeon::Dungeon()
@@ -280,7 +302,7 @@ void Dungeon::bossRoom(Player & p1)
 void Dungeon::treasureRoom(Player & p1)
 {
 	//create an array of treasures
-	std::string treasuresGold[] = { "25 gold", "50 gold", "100 gold", "250 gold", "500 gold", "1000 gold" };	//6 items
+	int treasuresGold[] = { 25, 50, 100, 250, 500, 1000};	//6 items
 	std::string treasureStatBoost[] = {"+1 Attack", "+3 Attack", "+5 Attack", "+1 Strength", "+3 Strength", "+5 Strength", "+1 Defence", "+3 Defence", "+5 Defence" };	//9 items
 	std::string treasureFood[] = {"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"};	//5 items
 	//fish is +5 health, lobster is +10, Minion meat is +15, Shark is +20, Dragon meat is +25
@@ -291,7 +313,9 @@ void Dungeon::treasureRoom(Player & p1)
 		if (randomNum == 0)	//land in the gold drop table
 		{
 			randomNum = rand() % 6;
-			p1.addItem(treasuresGold[randomNum]);
+			int gold = treasuresGold[randomNum];
+			cout << "You recieved " << gold << " gold!\n";
+			p1.setGold(p1.getGold() + gold);
 		}
 		else if (randomNum == 1)	//land in the stat boost drop table
 		{
@@ -315,6 +339,7 @@ Player::Player()
 {
 	health = 100;
 	isAlive = true;
+	gold = 0;
 	attackStat = 15;
 	strengthStat = 15;
 	defenceStat = 15;
@@ -429,6 +454,63 @@ void Player::increaseStat(std::string stat)
 		defenceStat += buff;	//buff has been applied
 		return;
 	}
+	return;
+}
+
+//Displays player current health,attack,strength,defence stats
+void Player::displayStat()
+{
+	cout << "\nHealth: " << health
+		<< "\nAttack: " << attackStat
+		<< "\nStrength: " << strengthStat
+		<< "\nDefence: " << defenceStat << "\n";
+}
+
+//Shows the player the inventory and allows the player to use it
+void Player::showAndUseInv()
+{
+	cout << "Gold: " << gold << "\n";
+	for (int i = 0; i < inventory.size(); i++)
+	{
+		cout << (i+1) << ". " << inventory[i] << std::endl;
+	}
+	cout << "0. to exit" << std::endl;
+	bool valid = false;
+	int answer;
+	do
+	{
+		cin >> answer;
+		if (answer < 0 || answer > inventory.size())
+			valid = false;
+		else
+			valid = true;
+	} while (valid == false);
+	//once we're here, check if the answer was 0, if it is exit, if not, retrieve the item
+	cout << "\n";
+	if (answer == 0)
+	{
+		return;
+	}
+	else
+	{
+		std::string item = inventory[answer-1];
+		//delete item from inventory and shift everything over
+		//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
+		inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
+		useItem(item);
+		return;
+	}
+}
+
+//Recieves an item to use on the player
+void Player::useItem(std::string item)
+{
+	//"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"
+	if (item == "Fish") { health += 5; }
+	else if (item == "Lobster") { health += 10; }
+	else if (item == "Minion Meat") { health += 15; }
+	else if (item == "Shark") { health += 20; }
+	else if (item == "Dragon Meat") { health += 25; }
 	return;
 }
 
