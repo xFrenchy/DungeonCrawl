@@ -122,6 +122,7 @@ void Game::showEndStats()
 	player.displayStat();
 	cout << "Gold: " << player.getGold() << "\n";
 	cout << "Last room: " << currentRoomNumber << "\n";
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 }
 
 Dungeon::Dungeon()
@@ -605,50 +606,53 @@ void Player::displayStat()
 //Shows the player the inventory and allows the player to use it
 void Player::showAndUseInv()
 {
-	cout << "Gold: " << gold << "\n";
-	for (int i = 0; i < inventory.size(); i++)
-	{
-		cout << (i+1) << ". " << inventory[i] << std::endl;
-	}
-	cout << "0. to exit" << std::endl;
-	bool valid = false;
-	int answer;
+	bool exit = false;
 	do
 	{
-		cin >> answer;
-		if (answer < 0 || answer > inventory.size())
+		cout << "Gold: " << gold << "\n";
+		for (int i = 0; i < inventory.size(); i++)
 		{
-			cout << "Invalid option!\n";
-			cin.clear();
-			cin.ignore(255, '\n');
-			valid = false;
+			cout << (i + 1) << ". " << inventory[i] << std::endl;
 		}
-		else
-			valid = true;
-	} while (valid == false);
-	//once we're here, check if the answer was 0, if it is exit, if not, retrieve the item
-	cout << "\n";
-	if (answer == 0)
-	{
-		return;
-	}
-	else
-	{
-		if (health >= 120)
+		cout << "0. to exit" << std::endl;
+		bool valid = false;
+		int answer;
+		do
 		{
-			cout << "You're health is already at 120 or above! You cannot eat anymore food!\n";
+			cin >> answer;
+			if (answer < 0 || answer > inventory.size())
+			{
+				cout << "Invalid option!\n";
+				cin.clear();
+				cin.ignore(255, '\n');
+				valid = false;
+			}
+			else
+				valid = true;
+		} while (valid == false);
+		//once we're here, check if the answer was 0, if it is exit, if not, retrieve the item
+		cout << "\n";
+		if (answer == 0)
+		{
+			exit = true;
 			return;
 		}
 		else
 		{
-			std::string item = inventory[answer - 1];
-			//delete item from inventory and shift everything over
-			//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
-			inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
-			useItem(item);
-			return;
-		}
-	}
+			if (health >= 120)
+			{
+				cout << "You're health is already at 120 or above! You cannot eat anymore food!\n";
+			}
+			else
+			{
+				std::string item = inventory[answer - 1];
+				//delete item from inventory and shift everything over
+				//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
+				inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
+				useItem(item);
+			}
+		}//else if answer isn't 0
+	} while (exit == false);
 }
 
 //Recieves an item to use on the player
@@ -660,6 +664,7 @@ void Player::useItem(std::string item)
 	else if (item == "Minion Meat") { health += 15; }
 	else if (item == "Shark") { health += 20; }
 	else if (item == "Dragon Meat") { health += 25; }
+	cout << "You consumed the " << item << "! Current health is " << health << "/120\n";
 	return;
 }
 
