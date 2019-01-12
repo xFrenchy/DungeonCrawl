@@ -413,36 +413,57 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 3:	//+1 attack
-				if (p1.getGold() >= 200)
+				if (p1.getGold() >= 200 && p1.getAttackStat() < 50)
 				{
 					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Attack");
 				}
 				else	//not enough gold
 				{
-					cout << "Not enough gold to purchase this item!\n";
+					if (p1.getAttackStat() >= 50)
+					{
+						cout << "Your attack stat is already maxed out!\n";
+					}
+					else
+					{
+						cout << "Not enough gold to purchase this item!\n";
+					}
 				}
 				break;
 			case 4:	//+1 str
-				if (p1.getGold() >= 200)
+				if (p1.getGold() >= 200 && p1.getStrengthStat() < 50)
 				{
 					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Strength");
 				}
 				else	//not enough gold
 				{
-					cout << "Not enough gold to purchase this item!\n";
+					if (p1.getStrengthStat() >= 50)
+					{
+						cout << "Your strength stat is already maxed out!\n";
+					}
+					else
+					{
+						cout << "Not enough gold to purchase this item!\n";
+					}
 				}
 				break;
 			case 5:	//+1 def
-				if (p1.getGold() >= 200)
+				if (p1.getGold() >= 200 && p1.getDefenceStat() < 50)
 				{
 					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Defence");
 				}
 				else	//not enough gold
 				{
-					cout << "Not enough gold to purchase this item!\n";
+					if (p1.getDefenceStat() >= 50)
+					{
+						cout << "Your defence stat is already maxed out!\n";
+					}
+					else
+					{
+						cout << "Not enough gold to purchase this item!\n";
+					}
 				}
 				break;
 			case 6:	//full heal
@@ -475,7 +496,7 @@ Player::Player()
 	health = 100;
 	isAlive = true;
 	gold = 0;
-	attackStat = 15;
+	attackStat = 15;	//base 15 stats
 	strengthStat = 15;
 	defenceStat = 15;
 }
@@ -570,8 +591,18 @@ void Player::increaseStat(std::string stat)
 		//in the string, the 1 spot is going to hold the number
 		char number = stat[1];
 		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
-		attackStat += buff;	//buff has been applied
-		return;
+		if (attackStat >= 50)	//this is the cap so that the player cannot go above 50 in their stats
+		{
+			cout << "Your current attack stat is already maxed out at: " << attackStat << std::endl;
+			return;
+		}
+		else
+		{
+			attackStat += buff;	//buff has been applied
+			if (attackStat > 50)
+				attackStat = 50;	//this way it cannot go above 50
+			return;
+		}
 	}
 	found = stat.find(strengthStr);
 	if (found != std::string::npos)	//if this is true, strength has been found and we apply the buff to attack
@@ -579,8 +610,18 @@ void Player::increaseStat(std::string stat)
 		//in the string, the 1 spot is going to hold the number
 		char number = stat[1];
 		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
-		strengthStat += buff;	//buff has been applied
-		return;
+		if (strengthStat >= 50)	//this is the cap so that the player cannot go above 50 in their stats
+		{
+			cout << "Your current strength stat is already maxed out at: " << strengthStat << std::endl;
+			return;
+		}
+		else
+		{
+			strengthStat += buff;	//buff has been applied
+			if (strengthStat > 50)
+				strengthStat = 50;	//this way it cannot go above 50
+			return;
+		}
 	}
 	found = stat.find(defenceStr);
 	if (found != std::string::npos)	//if this is true, strength has been found and we apply the buff to attack
@@ -588,8 +629,18 @@ void Player::increaseStat(std::string stat)
 		//in the string, the 1 spot is going to hold the number
 		char number = stat[1];
 		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
-		defenceStat += buff;	//buff has been applied
-		return;
+		if (defenceStat >= 50)	//this is the cap so that the player cannot go above 50 in their stats
+		{
+			cout << "Your current defence stat is already maxed out at: " << defenceStat << std::endl;
+			return;
+		}
+		else
+		{
+			defenceStat += buff;	//buff has been applied
+			if (defenceStat > 50)
+				defenceStat = 50;	//this way it cannot go above 50
+			return;
+		}
 	}
 	return;
 }
