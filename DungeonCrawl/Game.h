@@ -61,6 +61,7 @@ public:
 	void displayStat();
 	void showAndUseInv();
 	void useItem(std::string);
+	bool showAndIsUseInvFight();
 };
 
 
