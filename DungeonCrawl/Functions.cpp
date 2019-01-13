@@ -1,9 +1,13 @@
+#pragma comment(lib, "winmm.lib")
 #include "Functions.h"
 #include "Game.h"
 
 #include <iostream>	//cout
 #include <thread>	//this_thread::sleep_for
 #include <chrono>	//chrone::seconds
+#include <Windows.h>	//needed for mmsystem.h
+#include <Mmsystem.h>	//this is for playing sounds
+
 
 using std::cout;
 using std::cin;
@@ -50,6 +54,8 @@ void gameOver(EGameStatus status)
 	if (status == EGameStatus::User_won)
 	{
 		cout << "Congratulations! You won!\n";
+		PlaySound(TEXT("Victory.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		system("pause");
 	}
 	else
 	{
