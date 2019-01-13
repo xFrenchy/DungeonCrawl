@@ -6,6 +6,7 @@
 #include <chrono>	//chrone::seconds
 #include <cstdlib>	//rand
 #include <stdlib.h>	//clear screan system("CLS")
+#include <windows.h>	//this is for execute a piece of code until keypress
 
 using std::cout;
 using std::cin;
@@ -226,6 +227,12 @@ void Dungeon::minionRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
+		cout << "\Esc- go inside your inventory!\n";
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		if (GetAsyncKeyState(VK_ESCAPE))
+		{
+			p1.showAndUseInv();
+		}
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
 	return;
 }
@@ -474,7 +481,14 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				else	//not enough gold
 				{
-					cout << "Not enough gold to purchase this item!\n";
+					if (p1.getHealth() >= 120)
+					{
+						cout << "You're already at max health!\n";
+					}
+					else
+					{
+						cout << "Not enough gold to purchase this item!\n";
+					}
 				}
 				break;
 			case 0:	//exit
