@@ -247,15 +247,19 @@ void Dungeon::minionRoom(Player &p1)
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
 		//cin.ignore(255, '\n');	//this doesn't work right now
-		cout << "\nI- go inside your inventory!\n";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
+		if (p1.getHealth() > 0)
 		{
-			cin.ignore(255, '\n');
-			cin.clear();
-			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
-			playerSkipTurn = p1.showAndIsUseInvFight();
-		}
+			cout << "\nI- go inside your inventory!\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
+			{
+				cin.ignore(255, '\n');
+				cin.clear();
+				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
+				playerSkipTurn = p1.showAndIsUseInvFight();
+			}
+		}//if player is alive
+
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
 	return;
 }
@@ -360,15 +364,18 @@ void Dungeon::bossRoom(Player &p1)
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
 		//cin.ignore(255, '\n');	//this doesn't work right now
-		cout << "\nI- go inside your inventory!\n";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
+		if (p1.getHealth() > 0)
 		{
-			cin.ignore(255, '\n');
-			cin.clear();
-			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
-			playerSkipTurn = p1.showAndIsUseInvFight();
-		}
+			cout << "\nI- go inside your inventory!\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
+			{
+				cin.ignore(255, '\n');
+				cin.clear();
+				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
+				playerSkipTurn = p1.showAndIsUseInvFight();
+			}
+		}//if player is alive
 	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and boss is alive, if one dies, fight is over
 	return;
 }
