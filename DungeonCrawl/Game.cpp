@@ -7,6 +7,7 @@
 #include <cstdlib>	//rand
 #include <stdlib.h>	//clear screan system("CLS")
 #include <windows.h>	//this is for execute a piece of code until keypress
+#include <mmsystem.h>	//this is for playing sounds
 
 using std::cout;
 using std::cin;
@@ -14,7 +15,7 @@ using std::cin;
 Game::Game()
 {
 	gameOver = false;
-	maxRooms = 50;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
+	maxRooms = 15;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
 	currentRoomNumber = 1;
 }
 
@@ -22,6 +23,7 @@ EGameStatus Game::playGame()
 {
 	if (currentRoomNumber <= maxRooms)
 	{
+		//PlaySound(TEXT("Sounds\\AdventureSong.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		cout << "\nYou are currently on room " << currentRoomNumber << " out of " << maxRooms << std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		//TODO create the actual playable part
@@ -62,6 +64,7 @@ EGameStatus Game::playGame()
 		//once we're done with the playable part, if possible we move on to the next room
 		if (player.getHealth() <= 0)
 		{
+			PlaySound(TEXT("Sounds\\Death.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			cout << "Oh dear, you have died!\n";
 			return EGameStatus::EndGame;
 		}
@@ -161,6 +164,7 @@ void Dungeon::generateRoomType()
 
 void Dungeon::emptyRoom()
 {
+	PlaySound(TEXT("Sounds\\EmptyRoom.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout << "\nThis rooms seems to be empty...Nothing to do here.\n";
 	//TODO ask the user if they want to use their inventory before proceeding
 	std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -174,7 +178,7 @@ void Dungeon::minionRoom(Player &p1)
 	bool playerSkipTurn = false;
 	int userChoice;
 	cout << "You've encountered a minion!\n";
-
+	PlaySound(TEXT("Sounds\\MinionEncounter.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout << "\t`oo.' \n"
 		<< "\t`-')  ,.\n"
 		<< "\t( `-'/^`\n"
@@ -202,7 +206,9 @@ void Dungeon::minionRoom(Player &p1)
 	{
 		if (playerSkipTurn == false)
 		{
+			PlaySound(TEXT("Sounds\\PlayerHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			minion.defend(p1.attack());	//player attacked the minion and updated health
+			
 		}
 		else	//else it's true and the player skips a turn
 		{
@@ -212,7 +218,8 @@ void Dungeon::minionRoom(Player &p1)
 		}
 		if (minion.getIsAlive() == false)	//if the minion died
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(2400));
+			PlaySound(TEXT("Sounds\\MinionDeath.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 			cout << "You defeated the minion!\n";
@@ -229,12 +236,13 @@ void Dungeon::minionRoom(Player &p1)
 		}
 
 		//End of turn for player attacking minion
-		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
-
+		PlaySound(TEXT("Sounds\\MinionHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		p1.defend(minion.attack());	//minion attacks the player
-		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
+		PlaySound(TEXT("Sounds\\PlayerIsHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
@@ -243,10 +251,10 @@ void Dungeon::minionRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
 		{
-			playerSkipTurn = p1.showAndIsUseInvFight();
 			cin.ignore(255, '\n');
 			cin.clear();
 			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
+			playerSkipTurn = p1.showAndIsUseInvFight();
 		}
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
 	return;
@@ -258,7 +266,7 @@ void Dungeon::bossRoom(Player &p1)
 	bool playerSkipTurn = false;
 	int userChoice;
 	cout << "You've encountered a boss!\n";
-
+	PlaySound(TEXT("Sounds\\DragonEncounter.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout << "\t                                                 /===-_---~~~~~~~~~------____\n"
 		<< "\t                                                |===-~___                _,-'\n"
 		<< "\t                 -==\\\\                         `//~\\\\   ~~~~`---.___.-~~\n"
@@ -311,7 +319,9 @@ void Dungeon::bossRoom(Player &p1)
 	{
 		if (playerSkipTurn == false)
 		{
+			PlaySound(TEXT("Sounds\\PlayerHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			boss.defend(p1.attack());	//player attacked the boss and updated health
+			PlaySound(TEXT("Sounds\\DragonBeingHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		}
 		else	//else it's true and the player skips a turn
 		{
@@ -321,7 +331,8 @@ void Dungeon::bossRoom(Player &p1)
 		}
 		if (boss.getIsAlive() == false)	//if boss is dead
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(2400));
+			PlaySound(TEXT("Sounds\\DragonDeath.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 			cout << "You defeated the boss!\n";
@@ -338,12 +349,13 @@ void Dungeon::bossRoom(Player &p1)
 		}
 
 		//End of turn for player attacking boss
-		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
-
+		PlaySound(TEXT("Sounds\\Dragonhit.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		p1.defend(boss.attack());	//boss attacks player
-		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
+		PlaySound(TEXT("Sounds\\PlayerIsHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
@@ -352,10 +364,10 @@ void Dungeon::bossRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
 		{
-			playerSkipTurn = p1.showAndIsUseInvFight();
 			cin.ignore(255, '\n');
 			cin.clear();
 			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
+			playerSkipTurn = p1.showAndIsUseInvFight();
 		}
 	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and boss is alive, if one dies, fight is over
 	return;
@@ -364,6 +376,7 @@ void Dungeon::bossRoom(Player &p1)
 //Player steps into room and has their inventory filled with random treasure items
 void Dungeon::treasureRoom(Player &p1)
 {
+	PlaySound(TEXT("Sounds\\TreasureRoom.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout << "You found the treasure room!\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	//create an array of treasures
@@ -403,6 +416,7 @@ void Dungeon::treasureRoom(Player &p1)
 //Player steps into room and is prompted with a shop, player can buy items if they have enough gold and can buy as many items as they want
 void Dungeon::shopRoom(Player &p1)
 {
+	PlaySound(TEXT("Sounds\\Shop.wav"), NULL, SND_FILENAME | SND_ASYNC);
 	cout << "You found the shop room!A merchant has been awaiting for your arrival\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	bool exit = false;
