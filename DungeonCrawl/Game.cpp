@@ -171,6 +171,7 @@ void Dungeon::minionRoom(Player &p1)
 {
 	//Player will always go first
 	Minion minion;	//minion spawned in the room
+	bool playerSkipTurn = false;
 	int userChoice;
 	cout << "You've encountered a minion!\n";
 
@@ -199,7 +200,16 @@ void Dungeon::minionRoom(Player &p1)
 	cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 	do
 	{
-		minion.defend(p1.attack());	//player attacked the minion and updated health
+		if (playerSkipTurn == false)
+		{
+			minion.defend(p1.attack());	//player attacked the minion and updated health
+		}
+		else	//else it's true and the player skips a turn
+		{
+			cout << "\nYou just ate and can't hit this turn!\n";
+			playerSkipTurn = false;
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		}
 		if (minion.getIsAlive() == false)	//if the minion died
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(2400));
@@ -233,7 +243,7 @@ void Dungeon::minionRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
 		{
-			p1.showAndUseInv();
+			playerSkipTurn = p1.showAndIsUseInvFight();
 			cin.ignore(255, '\n');
 			cin.clear();
 			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
@@ -245,6 +255,7 @@ void Dungeon::minionRoom(Player &p1)
 void Dungeon::bossRoom(Player &p1)
 {
 	Boss boss;	//boss spawned in the room
+	bool playerSkipTurn = false;
 	int userChoice;
 	cout << "You've encountered a boss!\n";
 
@@ -298,7 +309,16 @@ void Dungeon::bossRoom(Player &p1)
 	cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 	do
 	{
-		boss.defend(p1.attack());	//player attacked the boss and updated health
+		if (playerSkipTurn == false)
+		{
+			boss.defend(p1.attack());	//player attacked the boss and updated health
+		}
+		else	//else it's true and the player skips a turn
+		{
+			cout << "\nYou just ate and can't hit this turn!\n";
+			playerSkipTurn = false;
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		}
 		if (boss.getIsAlive() == false)	//if boss is dead
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(2400));
@@ -332,7 +352,7 @@ void Dungeon::bossRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
 		{
-			p1.showAndUseInv();
+			playerSkipTurn = p1.showAndIsUseInvFight();
 			cin.ignore(255, '\n');
 			cin.clear();
 			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
@@ -747,6 +767,53 @@ void Player::useItem(std::string item)
 	else if (item == "Dragon Meat") { health += 25; }
 	cout << "You consumed the " << item << "! Current health is " << health << "/120\n";
 	return;
+}
+
+bool Player::showAndIsUseInvFight()
+{
+	for (int i = 0; i < inventory.size(); i++)
+	{
+		cout << (i + 1) << ". " << inventory[i] << std::endl;
+	}
+	cout << "0. to exit" << std::endl;
+	bool valid = false;
+	int answer;
+	do
+	{
+		cin >> answer;
+		if (answer < 0 || answer > inventory.size())
+		{
+			cout << "Invalid option!\n";
+			cin.clear();
+			cin.ignore(255, '\n');
+			valid = false;
+		}
+		else
+		valid = true;
+	} while (valid == false);
+	//once we're here, check if the answer was 0, if it is exit, if not, retrieve the item
+	cout << "\n";
+	if (answer == 0)
+	{
+		return false;
+	}
+	else
+	{
+		if (health >= 120)
+		{
+			cout << "You're health is already at 120 or above! You cannot eat anymore food!\n";
+		}
+		else
+		{
+			std::string item = inventory[answer - 1];
+			//delete item from inventory and shift everything over
+			//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
+			inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
+			useItem(item);
+			return true;
+		}
+	}//else if answer isn't 0
+return false;
 }
 
 Minion::Minion()
