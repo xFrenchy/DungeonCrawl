@@ -12,10 +12,12 @@ void displayIntro()
 {
 	cout << "Welcome to the Dungeon Crawler game!\n"
 		<< "It's simple:\n"
-		<< "\t1)Start fresh\n"
-		<< "\t2)Get loot from kills/rooms\n"
-		<< "\t3)Encounters are random\n"
-		<< "\t4)Make it through all the rooms and you win\n\n";
+		<< "\t-Start fresh each run with 100/120 health and base 15 stats\n"
+		<< "\t-Get loot from kills/rooms\n"
+		<< "\t-Encounters are random\n"
+		<< "\t-If your health is 120 or higher, you cannot heal further\n"
+		<< "\t-You cannot buy stat boosts past level 50\n"
+		<< "\t-Make it through all the rooms and you win\n\n";
 	return;
 }
 
