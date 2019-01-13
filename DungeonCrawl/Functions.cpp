@@ -54,12 +54,14 @@ void gameOver(EGameStatus status)
 	if (status == EGameStatus::User_won)
 	{
 		cout << "Congratulations! You won!\n";
-		PlaySound(TEXT("Victory.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(TEXT("Sounds\\Victory.wav"), NULL, SND_FILENAME | SND_ASYNC);
 		system("pause");
 	}
 	else
 	{
 		std::cout << "Game over!\n";
+		PlaySound(TEXT("Sounds\\GameOver.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		system("pause");
 	}
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
