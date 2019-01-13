@@ -12,15 +12,13 @@ levels go up and reach an end
 
 five encounter are implemented (empty room, minion, boss, treasure room, shop)
 
-During fight encouter, player fights the monster with random numbers generated for attacks based on player stats
+During fight encouter, player fights the monster with random numbers generated for attacks based on player stats and will be able to press the esc key for a brief period of time at the end of 1 turn if the player want to access their inventory
 
 Player can also attempt to run away from the minion and boss at the start
 
 once the end of the dungeon is reached, game is over 
 
 Things not implemented so far:
-
--User interaction with their inventory during combat
 
 -Unlimited rooms
 
