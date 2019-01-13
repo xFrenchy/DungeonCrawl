@@ -227,11 +227,16 @@ void Dungeon::minionRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(2400));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
-		cout << "\Esc- go inside your inventory!\n";
+		cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
+		cin.ignore(255, '\n');	//this doesn't work right now
+		cout << "\nI- go inside your inventory!\n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-		if (GetAsyncKeyState(VK_ESCAPE))
+		if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
 		{
 			p1.showAndUseInv();
+			cin.ignore(255, '\n');
+			cin.clear();
+			//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
 		}
 	} while (p1.getIsAlive() && minion.getIsAlive());	//while p1 is alive and minion is alive, if one dies, fight is over
 	return;
