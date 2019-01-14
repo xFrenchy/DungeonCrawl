@@ -16,8 +16,9 @@ using std::cin;
 Game::Game()
 {
 	gameOver = false;
-	maxRooms = 15;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
+	maxRooms = 30;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
 	currentRoomNumber = 1;
+	lastRoom = ETypeOfEncounter::Null;
 }
 
 EGameStatus Game::playGame()
@@ -33,8 +34,9 @@ EGameStatus Game::playGame()
 		* Run correct code based on encounter
 		*/
 		ETypeOfEncounter encounter;
-		dungeonRoom.generateRoomType();
+		dungeonRoom.generateRoomType(lastRoom);
 		encounter = dungeonRoom.getRoomType();
+		lastRoom = encounter;	//setting up last room for next turn
 		switch (encounter)
 		{
 		case ETypeOfEncounter::Boss:
@@ -56,6 +58,9 @@ EGameStatus Game::playGame()
 		case ETypeOfEncounter::Treasure:
 			//execute code for treasure room
 			dungeonRoom.treasureRoom(player);
+			break;
+		case ETypeOfEncounter::SwarmOfMinions:
+			dungeonRoom.swarmMinionRoom(player);
 			break;
 		default:
 			cout << "A non recognizable encouter happened, this is an error!\n";
@@ -135,32 +140,44 @@ Dungeon::Dungeon()
 	roomType = ETypeOfEncounter::Empty;
 }
 
-void Dungeon::generateRoomType()
+void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom)
 {
 	//TODO create rarity to rooms
-	int result = rand() % amountOfEncounterTypes;
-	switch (result)
+	bool validRoom = false;
+	do
 	{
-	case 0:
-		roomType = ETypeOfEncounter::Boss;
-		break;
-	case 1:
-		roomType = ETypeOfEncounter::Empty;
-		break;
-	case 2:
-		roomType = ETypeOfEncounter::Minion;
-		break;
-	case 3:
-		roomType = ETypeOfEncounter::Shop;
-		break;
-	case 4:
-		roomType = ETypeOfEncounter::Treasure;
-		break;
-	default:
-		cout << "Something went wrong while generating encounter!\n";
-		roomType = ETypeOfEncounter::Empty;
-		break;
-	}
+		int result = rand() % amountOfEncounterTypes;
+		switch (result)
+		{
+		case 0:
+			roomType = ETypeOfEncounter::Boss;
+			break;
+		case 1:
+			roomType = ETypeOfEncounter::Empty;
+			break;
+		case 2:
+			roomType = ETypeOfEncounter::Minion;
+			break;
+		case 3:
+			roomType = ETypeOfEncounter::Shop;
+			break;
+		case 4:
+			roomType = ETypeOfEncounter::Treasure;
+			break;
+		case 5:
+			roomType = ETypeOfEncounter::SwarmOfMinions;
+			break;
+		default:
+			cout << "Something went wrong while generating encounter!\n";
+			roomType = ETypeOfEncounter::Empty;
+			break;
+		}//end of switch case
+		if (lastRoom != roomType)
+		{
+			validRoom = true;
+		}
+	} while (validRoom == false);
+	return;
 }
 
 void Dungeon::emptyRoom()
@@ -207,7 +224,7 @@ void Dungeon::minionRoom(Player &p1)
 	{
 		if (playerSkipTurn == false)
 		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE6 is the playerHit
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE6 is the playerHit
 			minion.defend(p1.attack());	//player attacked the minion and updated health
 			
 		}
@@ -243,8 +260,8 @@ void Dungeon::minionRoom(Player &p1)
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE8), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE8 is the minionHit, this one is sync because if it was async
 														//the player is hit sound will play almost instantly and you won't hear minion hit sound
 		p1.defend(minion.attack());	//minion attacks the player
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE9 is the playerIsHit
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
@@ -327,7 +344,7 @@ void Dungeon::bossRoom(Player &p1)
 		{
 			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE6 is the playerHit, sync so that dragonBeingHit is heard after
 			boss.defend(p1.attack());	//player attacked the boss and updated health
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE11), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE10 is the dragonBeingHit
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE11), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE10 is the dragonBeingHit
 		}
 		else	//else it's true and the player skips a turn
 		{
@@ -360,8 +377,8 @@ void Dungeon::bossRoom(Player &p1)
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE13), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE13 is the dragonHit, sync to hear it before playerIsHit
 		p1.defend(boss.attack());	//boss attacks player
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE9 is the playerIsHit
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
@@ -537,6 +554,7 @@ void Dungeon::shopRoom(Player &p1)
 				{
 					p1.setGold(p1.getGold() - 120);
 					p1.setHealth(120);
+					cout << "Your health is now at: " << p1.getHealth() << "/120\n";
 				}
 				else	//not enough gold
 				{
@@ -561,6 +579,130 @@ void Dungeon::shopRoom(Player &p1)
 	} while (exit == false);
 
 	cout << "Thanks for visiting!\n";
+	return;
+}
+
+void Dungeon::swarmMinionRoom(Player & p1)
+{
+	//Player will always go first
+	Minion minion1, minion2, minion3;	//minions spawned in the room
+	bool playerSkipTurn = false;
+	int userChoice;
+	cout << "You've encountered a swarm of minion!\n";
+	cout << "\t`oo.'\t\t\t`oo.'\t\t\t`oo.'\n"
+		<< "\t`-')  ,.\t\t`-')  ,.\t\t`-')  ,.\n"
+		<< "\t( `-'/^`\t\t( `-'/^`\t\t( `-'/^`\n"
+		<< "\t-`J-d   \t\t-`J-d   \t\t-`J-d   \n";
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE5 is the minion encounter
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE5 is the minion encounter
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE5 is the minion encounter
+	cout << "\nWould you like to try to fight or run?\n"
+		<< "1)Fight\n"
+		<< "2)Run\n";
+	//check that userChoice is valid
+	userChoice = intOneorTwo();	//this forces the user to type in a 1 or a 2 so I know userChoice is either a 1 or a 2 after that function
+	if (userChoice == 2)
+	{
+		//attempt to escape
+		bool hasEscaped = false;
+		hasEscaped = minion1.isEscape();	//escape chance will still be 25%
+		if (hasEscaped == true)
+		{
+			return;
+		}
+	}
+	//else we fight
+	system("CLS");	//clears the screen
+	cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+	do
+	{
+		if (playerSkipTurn == false)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE6 is the playerHit
+			if (minion1.getIsAlive() == true)	//attack the first minion if it's alive
+			{
+				minion1.defend(p1.attack());	//player attacked the minion and updated health
+			}
+			else if (minion2.getIsAlive() == true)	//if we're here, the first minion is dead and we attack the second
+			{
+				minion2.defend(p1.attack());
+			}
+			else	//else only the third minion is alive
+			{
+				minion3.defend(p1.attack());
+			}
+		}
+		else	//else it's true and the player skips a turn
+		{
+			cout << "\nYou just ate and can't hit this turn!\n";
+			playerSkipTurn = false;
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		}
+		if (minion1.getIsAlive() == false && minion2.getIsAlive() == false && minion3.getIsAlive() == false)	//if all minions died
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE7), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE7 is the minion death
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			system("CLS");
+			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+			cout << "You defeated the swarm of minions!\n";
+			//TODO add better loot
+			cout << "You recieved 50 gold!\n";
+			p1.setGold(p1.getGold() + 50);
+			std::string loot[] = { "Minion Meat" };	//expand on this later
+			int lootChance = rand() % 2;	//0 or 1
+			if (lootChance == 0)
+			{
+				p1.addItem("Minion Meat");
+			}
+			break;
+		}
+
+		//End of turn for player attacking minion
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+		if (minion1.getIsAlive() == true && p1.getIsAlive() == true)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE8), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE8 is the minionHit, this one is sync because if it was async
+																				 //the player is hit sound will play almost instantly and you won't hear minion hit sound
+			p1.defend(minion1.attack());	//minion attacks the player
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
+		}
+			
+		if (minion2.getIsAlive() == true && p1.getIsAlive() == true)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE8), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE8 is the minionHit, this one is sync because if it was async
+																				 //the player is hit sound will play almost instantly and you won't hear minion hit sound
+			p1.defend(minion2.attack());	//minion attacks the player
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
+		}
+			
+		if (minion3.getIsAlive() == true && p1.getIsAlive() == true)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE8), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE8 is the minionHit, this one is sync because if it was async
+																				 //the player is hit sound will play almost instantly and you won't hear minion hit sound
+			p1.defend(minion3.attack());	//minion attacks the player
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
+		}
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
+		//cin.ignore(255, '\n');	//this doesn't work right now
+		if (p1.getHealth() > 0)
+		{
+			cout << "\nI- go inside your inventory!\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
+			{
+				cin.ignore(255, '\n');
+				cin.clear();
+				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
+				playerSkipTurn = p1.showAndIsUseInvFight();
+			}
+		}//if player is alive
+
+	} while (p1.getIsAlive());	//while p1 is alive, if all the minions die, we break out of the loop
 	return;
 }
 
@@ -789,6 +931,7 @@ void Player::useItem(std::string item)
 	else if (item == "Shark") { health += 20; }
 	else if (item == "Dragon Meat") { health += 25; }
 	cout << "You consumed the " << item << "! Current health is " << health << "/120\n";
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE18), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE18 is eating
 	return;
 }
 
