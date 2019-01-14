@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-const int amountOfEncounterTypes = 5;
+const int amountOfEncounterTypes = 6;
 
 
 enum class EGameStatus
@@ -20,11 +20,13 @@ enum class EGameStatus
 
 enum class ETypeOfEncounter
 {
+	Null,
 	Treasure,
 	Minion,
 	Empty,
 	Boss,
-	Shop
+	Shop,
+	SwarmOfMinions
 };
 
 
@@ -124,12 +126,13 @@ public:
 
 	ETypeOfEncounter getRoomType() { return roomType; }
 
-	void generateRoomType();
+	void generateRoomType(ETypeOfEncounter &);
 	void emptyRoom();
 	void minionRoom(Player &p1);
 	void bossRoom(Player &p1);
 	void treasureRoom(Player &p1);
 	void shopRoom(Player &p1);
+	void swarmMinionRoom(Player &p1);
 };
 
 
@@ -141,6 +144,7 @@ private:
 	int maxRooms;	//keeps track of how many rooms there is supposed to be during the game
 	int currentRoomNumber;
 	Player player;
+	ETypeOfEncounter lastRoom;
 public:
 	Game();
 	void setGameOver(bool _gameOver) { gameOver = _gameOver; }
