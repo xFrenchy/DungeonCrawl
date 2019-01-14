@@ -169,6 +169,7 @@
     <Media Include="Sounds\DragonDeath.wav" />
     <Media Include="Sounds\DragonEncounter.wav" />
     <Media Include="Sounds\Dragonhit.wav" />
+    <Media Include="Sounds\Eating.wav" />
     <Media Include="Sounds\EmptyRoom.wav" />
     <Media Include="Sounds\GameOver.wav" />
     <Media Include="Sounds\MinionDeath.wav" />
@@ -181,6 +182,7 @@
     <Media Include="Sounds\Victory.wav" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="wave18.bin" />
     <None Include="wave3.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
