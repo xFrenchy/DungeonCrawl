@@ -35,5 +35,65 @@
     <ClInclude Include="Items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sounds\AdventureSong.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\Victory.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\GameOver.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\MinionEncounter.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\PlayerHit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\MinionDeath.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\MinionHit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\PlayerIsHit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\DragonEncounter.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\DragonBeingHit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\DragonDeath.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\Dragonhit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\EmptyRoom.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\TreasureRoom.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sounds\Shop.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wave3.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

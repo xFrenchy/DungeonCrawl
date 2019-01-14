@@ -30,7 +30,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -157,6 +157,31 @@
     <ClInclude Include="Functions.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Items.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sounds\AdventureSong.wav" />
+    <Media Include="Sounds\Death.wav" />
+    <Media Include="Sounds\DragonBeingHit.wav" />
+    <Media Include="Sounds\DragonDeath.wav" />
+    <Media Include="Sounds\DragonEncounter.wav" />
+    <Media Include="Sounds\Dragonhit.wav" />
+    <Media Include="Sounds\EmptyRoom.wav" />
+    <Media Include="Sounds\GameOver.wav" />
+    <Media Include="Sounds\MinionDeath.wav" />
+    <Media Include="Sounds\MinionEncounter.wav" />
+    <Media Include="Sounds\MinionHit.wav" />
+    <Media Include="Sounds\PlayerHit.wav" />
+    <Media Include="Sounds\PlayerIsHit.wav" />
+    <Media Include="Sounds\Shop.wav" />
+    <Media Include="Sounds\TreasureRoom.wav" />
+    <Media Include="Sounds\Victory.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wave3.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
