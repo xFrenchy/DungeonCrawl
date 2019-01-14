@@ -1,12 +1,13 @@
-#pragma comment(lib, "winmm.lib")
+//#pragma comment(lib, "winmm.lib")
 #include "Functions.h"
 #include "Game.h"
+#include "resource.h"
 
 #include <iostream>	//cout
 #include <thread>	//this_thread::sleep_for
 #include <chrono>	//chrone::seconds
-#include <Windows.h>	//needed for mmsystem.h
-#include <Mmsystem.h>	//this is for playing sounds
+#include <windows.h>	//needed for mmsystem.h
+#include <mmsystem.h>	//this is for playing sounds
 
 
 using std::cout;
@@ -54,13 +55,13 @@ void gameOver(EGameStatus status)
 	if (status == EGameStatus::User_won)
 	{
 		cout << "Congratulations! You won!\n";
-		PlaySound(TEXT("Sounds\\Victory.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE3), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE3 is from the resource file and is the victory song
 		system("pause");
 	}
 	else
 	{
 		std::cout << "Game over!\n";
-		PlaySound(TEXT("Sounds\\GameOver.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE4), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE4 is game over
 		system("pause");
 	}
 	std::this_thread::sleep_for(std::chrono::seconds(1));

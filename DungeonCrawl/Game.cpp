@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Functions.h"
+#include "resource.h"
 
 #include <iostream>
 #include <thread>	//this_thread::sleep_for
@@ -64,7 +65,7 @@ EGameStatus Game::playGame()
 		//once we're done with the playable part, if possible we move on to the next room
 		if (player.getHealth() <= 0)
 		{
-			PlaySound(TEXT("Sounds\\Death.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE17), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE17 is the playerDeath, sync so you can hear it before gameOver
 			cout << "Oh dear, you have died!\n";
 			return EGameStatus::EndGame;
 		}
@@ -164,7 +165,7 @@ void Dungeon::generateRoomType()
 
 void Dungeon::emptyRoom()
 {
-	PlaySound(TEXT("Sounds\\EmptyRoom.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE14), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE14 is empty room
 	cout << "\nThis rooms seems to be empty...Nothing to do here.\n";
 	//TODO ask the user if they want to use their inventory before proceeding
 	std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -178,7 +179,7 @@ void Dungeon::minionRoom(Player &p1)
 	bool playerSkipTurn = false;
 	int userChoice;
 	cout << "You've encountered a minion!\n";
-	PlaySound(TEXT("Sounds\\MinionEncounter.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE5 is the minion encounter
 	cout << "\t`oo.' \n"
 		<< "\t`-')  ,.\n"
 		<< "\t( `-'/^`\n"
@@ -206,7 +207,7 @@ void Dungeon::minionRoom(Player &p1)
 	{
 		if (playerSkipTurn == false)
 		{
-			PlaySound(TEXT("Sounds\\PlayerHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE6 is the playerHit
 			minion.defend(p1.attack());	//player attacked the minion and updated health
 			
 		}
@@ -218,7 +219,7 @@ void Dungeon::minionRoom(Player &p1)
 		}
 		if (minion.getIsAlive() == false)	//if the minion died
 		{
-			PlaySound(TEXT("Sounds\\MinionDeath.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE7), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE7 is the minion death
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
@@ -239,9 +240,10 @@ void Dungeon::minionRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
-		PlaySound(TEXT("Sounds\\MinionHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE8), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE8 is the minionHit, this one is sync because if it was async
+														//the player is hit sound will play almost instantly and you won't hear minion hit sound
 		p1.defend(minion.attack());	//minion attacks the player
-		PlaySound(TEXT("Sounds\\PlayerIsHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE9 is the playerIsHit
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
@@ -270,7 +272,7 @@ void Dungeon::bossRoom(Player &p1)
 	bool playerSkipTurn = false;
 	int userChoice;
 	cout << "You've encountered a boss!\n";
-	PlaySound(TEXT("Sounds\\DragonEncounter.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE10), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE10 is the dragon encounter
 	cout << "\t                                                 /===-_---~~~~~~~~~------____\n"
 		<< "\t                                                |===-~___                _,-'\n"
 		<< "\t                 -==\\\\                         `//~\\\\   ~~~~`---.___.-~~\n"
@@ -323,9 +325,9 @@ void Dungeon::bossRoom(Player &p1)
 	{
 		if (playerSkipTurn == false)
 		{
-			PlaySound(TEXT("Sounds\\PlayerHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE6 is the playerHit, sync so that dragonBeingHit is heard after
 			boss.defend(p1.attack());	//player attacked the boss and updated health
-			PlaySound(TEXT("Sounds\\DragonBeingHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE11), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE10 is the dragonBeingHit
 		}
 		else	//else it's true and the player skips a turn
 		{
@@ -335,7 +337,7 @@ void Dungeon::bossRoom(Player &p1)
 		}
 		if (boss.getIsAlive() == false)	//if boss is dead
 		{
-			PlaySound(TEXT("Sounds\\DragonDeath.wav"), NULL, SND_FILENAME | SND_ASYNC);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE12 is the dragonDeath
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
@@ -356,9 +358,9 @@ void Dungeon::bossRoom(Player &p1)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
-		PlaySound(TEXT("Sounds\\Dragonhit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE13), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE13 is the dragonHit, sync to hear it before playerIsHit
 		p1.defend(boss.attack());	//boss attacks player
-		PlaySound(TEXT("Sounds\\PlayerIsHit.wav"), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE9 is the playerIsHit
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
 		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
@@ -383,7 +385,7 @@ void Dungeon::bossRoom(Player &p1)
 //Player steps into room and has their inventory filled with random treasure items
 void Dungeon::treasureRoom(Player &p1)
 {
-	PlaySound(TEXT("Sounds\\TreasureRoom.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE15), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE15 is the treasureRoom
 	cout << "You found the treasure room!\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	//create an array of treasures
@@ -423,7 +425,7 @@ void Dungeon::treasureRoom(Player &p1)
 //Player steps into room and is prompted with a shop, player can buy items if they have enough gold and can buy as many items as they want
 void Dungeon::shopRoom(Player &p1)
 {
-	PlaySound(TEXT("Sounds\\Shop.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE16), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE16 is the shopRoom
 	cout << "You found the shop room!A merchant has been awaiting for your arrival\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	bool exit = false;
