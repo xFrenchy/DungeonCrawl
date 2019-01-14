@@ -6,13 +6,13 @@ At the current stage:
 
 -The user is asked if they want to play 
 
--There are only 5 Dungeon rooms that are being randomly generated,
+-There are only 6 Dungeon rooms that are being randomly generated, cannot get the same room back to back
 
 -The user is asked if they want to proceed to the next level after every level
 
 -Levels go up and reach an end 
 
--Five encounter are implemented (empty room, minion, boss, treasure room, shop)
+-Six encounter are implemented (empty room, minion, boss, treasure room, shop, swarms of minions)
 
 -During fight encouter, player fights the monster with random numbers generated for attacks based on player stats and will be able to press the i key for a brief period of time at the end of the turn if the player want to access their inventory
 
