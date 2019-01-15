@@ -92,6 +92,7 @@ public:
 	virtual int attack() = 0;
 	void defend(int damage);
 	virtual bool isEscape() = 0;
+	virtual void deathLoot(Player &p1) = 0;
 };
 
 
@@ -103,6 +104,7 @@ public:
 	Minion();
 	int attack();
 	bool isEscape();
+	void deathLoot(Player &p1);
 };
 
 
@@ -114,6 +116,7 @@ public:
 	Boss();
 	int attack();
 	bool isEscape();
+	void deathLoot(Player &p1);
 };
 
 class Dungeon
