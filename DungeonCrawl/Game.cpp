@@ -236,20 +236,13 @@ void Dungeon::minionRoom(Player &p1)
 		}
 		if (minion.getIsAlive() == false)	//if the minion died
 		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE7), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE7 is the minion death
-			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			//since the minion is dead, we're going to set the minion's health to 0 to prevent it from going into the negatives
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed for player to see what they hit on the minion to kill it
+			minion.setHealth(0);
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion HP: " << minion.getHealth() << std::endl;
 			cout << "You defeated the minion!\n";
-			//TODO add better loot
-			cout << "You recieved 50 gold!\n";
-			p1.setGold(p1.getGold() + 50);
-			std::string loot[] = { "Minion Meat" };	//expand on this later
-			int lootChance = rand() % 2;	//0 or 1
-			if (lootChance == 0)
-			{
-				p1.addItem("Minion Meat");
-			}
+			minion.deathLoot(p1);
 			break;
 		}
 
@@ -354,20 +347,12 @@ void Dungeon::bossRoom(Player &p1)
 		}
 		if (boss.getIsAlive() == false)	//if boss is dead
 		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE12 is the dragonDeath
-			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed so player sees what they hit to kill the boss
+			boss.setHealth(0);
 			system("CLS");
 			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
 			cout << "You defeated the boss!\n";
-			//TODO add loot
-			cout << "You recieved 200 gold!\n";
-			p1.setGold(p1.getGold() + 200);
-			std::string loot[] = { "Dragon Meat" };	//expand on this later
-			int lootChance = rand() % 2;	//0 or 1
-			if (lootChance == 0)
-			{
-				p1.addItem("Dragon Meat");
-			}
+			boss.deathLoot(p1);
 			break;
 		}
 
@@ -595,7 +580,7 @@ void Dungeon::swarmMinionRoom(Player & p1)
 		<< "\t-`J-d   \t\t-`J-d   \t\t-`J-d   \n";
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE5 is the minion encounter
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE5 is the minion encounter
-	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE5 is the minion encounter
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE5), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE5 is the minion encounter
 	cout << "\nWould you like to try to fight or run?\n"
 		<< "1)Fight\n"
 		<< "2)Run\n";
@@ -622,14 +607,45 @@ void Dungeon::swarmMinionRoom(Player & p1)
 			if (minion1.getIsAlive() == true)	//attack the first minion if it's alive
 			{
 				minion1.defend(p1.attack());	//player attacked the minion and updated health
+				if (minion1.getIsAlive() == false)	//if the minion died
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed for player to see what they hit on the minion to kill it
+					//since minion is dead, we prevent it's health from going negative
+					minion1.setHealth(0);
+					system("CLS");
+					cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+					cout << "You defeated the first minion!\n";
+					minion1.deathLoot(p1);
+				}
 			}
 			else if (minion2.getIsAlive() == true)	//if we're here, the first minion is dead and we attack the second
 			{
 				minion2.defend(p1.attack());
+				if (minion2.getIsAlive() == false)	//if the minion died
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed for player to see what they hit on the minion to kill it
+					//since minion is dead, we prevent it's health from going negative
+					minion2.setHealth(0);
+					system("CLS");
+					cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+					cout << "You defeated the second minion!\n";
+					minion2.deathLoot(p1);
+				}
 			}
 			else	//else only the third minion is alive
 			{
 				minion3.defend(p1.attack());
+				if (minion3.getIsAlive() == false)	//if the minion died
+				{
+					std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed for player to see what they hit on the minion to kill it
+					//since minion is dead, we prevent it's health from going negative
+					minion3.setHealth(0);
+					system("CLS");
+					cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
+					cout << "You defeated the swarm of minions!\n";
+					minion3.deathLoot(p1);
+					break;
+				}
 			}
 		}
 		else	//else it's true and the player skips a turn
@@ -637,24 +653,6 @@ void Dungeon::swarmMinionRoom(Player & p1)
 			cout << "\nYou just ate and can't hit this turn!\n";
 			playerSkipTurn = false;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-		}
-		if (minion1.getIsAlive() == false && minion2.getIsAlive() == false && minion3.getIsAlive() == false)	//if all minions died
-		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE7), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE7 is the minion death
-			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-			system("CLS");
-			cout << "Player HP: " << p1.getHealth() << "\t\t\tMinion's HP: " << minion1.getHealth() << "\t" << minion2.getHealth() << "\t" << minion3.getHealth() << std::endl;
-			cout << "You defeated the swarm of minions!\n";
-			//TODO add better loot
-			cout << "You recieved 50 gold!\n";
-			p1.setGold(p1.getGold() + 50);
-			std::string loot[] = { "Minion Meat" };	//expand on this later
-			int lootChance = rand() % 2;	//0 or 1
-			if (lootChance == 0)
-			{
-				p1.addItem("Minion Meat");
-			}
-			break;
 		}
 
 		//End of turn for player attacking minion
@@ -1068,6 +1066,22 @@ bool Minion::isEscape()
 	return false;	//else return false because the player did not manage to escape
 }
 
+//Function that tells the user the minion has died and rewards the player with loot
+void Minion::deathLoot(Player & p1)
+{
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE7), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE7 is the minion death
+	//TODO add better loot
+	cout << "You recieved 50 gold!\n";
+	p1.setGold(p1.getGold() + 50);
+	std::string loot[] = { "Minion Meat" };	//expand on this later
+	int lootChance = rand() % 2;	//0 or 1
+	if (lootChance == 0)
+	{
+		p1.addItem("Minion Meat");
+	}
+	return;
+}
+
 Boss::Boss()
 {
 	setHealth(85);
@@ -1127,6 +1141,22 @@ bool Boss::isEscape()
 	cout << "The boss doesn't let you run away!\n";
 	std::this_thread::sleep_for(std::chrono::milliseconds(1200));	//the code that happens after this is a clear screen so this is needed to see the statement
 	return false;	//else return false because the player did not manage to escape
+}
+
+//Function that tells the user the boss has died and rewards the player with loot
+void Boss::deathLoot(Player & p1)
+{
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE12 is the dragonDeath
+	//TODO add loot
+	cout << "You recieved 200 gold!\n";
+	p1.setGold(p1.getGold() + 200);
+	std::string loot[] = { "Dragon Meat" };	//expand on this later
+	int lootChance = rand() % 2;	//0 or 1
+	if (lootChance == 0)
+	{
+		p1.addItem("Dragon Meat");
+	}
+	return;
 }
 
 void Monster::defend(int damage)
