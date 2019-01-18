@@ -39,9 +39,9 @@ EGameStatus Game::playGame()
 		lastRoom = encounter;	//setting up last room for next turn
 		switch (encounter)
 		{
-		case ETypeOfEncounter::Boss:
-			//execute code for boss room
-			dungeonRoom.bossRoom(player);
+		case ETypeOfEncounter::Dragon:
+			//execute code for Dragon room
+			dungeonRoom.dragonRoom(player);
 			break;
 		case ETypeOfEncounter::Empty:
 			//execute code for empty room
@@ -61,6 +61,9 @@ EGameStatus Game::playGame()
 			break;
 		case ETypeOfEncounter::SwarmOfMinions:
 			dungeonRoom.swarmMinionRoom(player);
+			break;
+		case ETypeOfEncounter::SmallDragon:
+			dungeonRoom.smallDragonRoom(player);
 			break;
 		default:
 			cout << "A non recognizable encouter happened, this is an error!\n";
@@ -151,7 +154,7 @@ void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom, int currentRoomNumber
 		switch (result)
 		{
 		case 0:
-			roomType = ETypeOfEncounter::Boss;
+			roomType = ETypeOfEncounter::Dragon;
 			break;
 		case 1:
 			roomType = ETypeOfEncounter::Empty;
@@ -168,6 +171,9 @@ void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom, int currentRoomNumber
 		case 5:
 			roomType = ETypeOfEncounter::SwarmOfMinions;
 			break;
+		case 6:
+			roomType = ETypeOfEncounter::SmallDragon;
+			break;
 		default:
 			cout << "Something went wrong while generating encounter!\n";
 			roomType = ETypeOfEncounter::Empty;
@@ -182,13 +188,13 @@ void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom, int currentRoomNumber
 			}
 			else if (currentRoomNumber == 20)	//first medium boss encounter
 			{
-				roomType = ETypeOfEncounter::Boss;
+				roomType = ETypeOfEncounter::Dragon;
 				validRoom = true;
 			}
 			//else if(currentRoomNumber == 30)	//first hard boss encounter
 			else if (roomType == ETypeOfEncounter::SwarmOfMinions && currentRoomNumber < 10)	//cannot get swarm of minions before level 10
 				validRoom = false;
-			else if (roomType == ETypeOfEncounter::Boss && currentRoomNumber < 20)
+			else if (roomType == ETypeOfEncounter::Dragon && currentRoomNumber < 20)
 				validRoom = false;
 			//else if()
 			else	//else it's valid
@@ -296,12 +302,12 @@ void Dungeon::minionRoom(Player &p1)
 	return;
 }
 
-void Dungeon::bossRoom(Player &p1)
+void Dungeon::dragonRoom(Player &p1)
 {
-	Boss boss;	//boss spawned in the room
+	Dragon boss;	//boss spawned in the room
 	bool playerSkipTurn = false;
 	int userChoice;
-	cout << "You've encountered a boss!\n";
+	cout << "You've encountered a dragon!\n";
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE10), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE10 is the dragon encounter
 	cout << "\t                                                 /===-_---~~~~~~~~~------____\n"
 		<< "\t                                                |===-~___                _,-'\n"
@@ -350,13 +356,13 @@ void Dungeon::bossRoom(Player &p1)
 	}
 	//else we fight
 	system("CLS");	//clears the screen
-	cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+	cout << "Player HP: " << p1.getHealth() << "\t\t\tDragon HP: " << boss.getHealth() << std::endl;
 	do
 	{
 		if (playerSkipTurn == false)
 		{
 			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE6 is the playerHit, sync so that dragonBeingHit is heard after
-			boss.defend(p1.attack());	//player attacked the boss and updated health
+			boss.defend(p1.attack());	//player attacked the dragon and updated health
 			PlaySound(MAKEINTRESOURCE(IDR_WAVE11), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE10 is the dragonBeingHit
 		}
 		else	//else it's true and the player skips a turn
@@ -365,27 +371,27 @@ void Dungeon::bossRoom(Player &p1)
 			playerSkipTurn = false;
 			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		}
-		if (boss.getIsAlive() == false)	//if boss is dead
+		if (boss.getIsAlive() == false)	//if dragon is dead
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed so player sees what they hit to kill the boss
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed so player sees what they hit to kill the dragon
 			boss.setHealth(0);
 			system("CLS");
-			cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
-			cout << "You defeated the boss!\n";
+			cout << "Player HP: " << p1.getHealth() << "\t\t\tDragon HP: " << boss.getHealth() << std::endl;
+			cout << "You defeated the dragon!\n";
 			boss.deathLoot(p1);
 			break;
 		}
 
-		//End of turn for player attacking boss
+		//End of turn for player attacking dragon
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
-		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tDragon HP: " << boss.getHealth() << std::endl;
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE13), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE13 is the dragonHit, sync to hear it before playerIsHit
-		p1.defend(boss.attack());	//boss attacks player
+		p1.defend(boss.attack());	//dragon attacks player
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
 		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		system("CLS");
-		cout << "Player HP: " << p1.getHealth() << "\t\t\tBoss HP: " << boss.getHealth() << std::endl;
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tDragon HP: " << boss.getHealth() << std::endl;
 		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
 		//cin.ignore(255, '\n');	//this doesn't work right now
 		if (p1.getHealth() > 0)
@@ -400,7 +406,7 @@ void Dungeon::bossRoom(Player &p1)
 				playerSkipTurn = p1.showAndIsUseInvFight();
 			}
 		}//if player is alive
-	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and boss is alive, if one dies, fight is over
+	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and dragon is alive, if one dies, fight is over
 	return;
 }
 
@@ -724,6 +730,102 @@ void Dungeon::swarmMinionRoom(Player & p1)
 	return;
 }
 
+//Function that deals with the combat in that room
+void Dungeon::smallDragonRoom(Player & p1)
+{
+	SmallDragon drag;	//small dragon spawned in the room
+	bool playerSkipTurn = false;
+	int userChoice;
+	cout << "You've encountered a small dragon!\n";
+	//PlaySound(MAKEINTRESOURCE(IDR_WAVE10), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE10 is the dragon encounter
+	cout << "\t<>=======() \n"
+		<< "\t(/\\___   /|\\\\          ()==========<>_\n"
+		<< "\t      \\_/ | \\\\        //|\\   ______/ \\)\n"
+		<< "\t        \\_|  \\\\      // | \\_/\n"
+		<< "\t          \\|\\/|\\_   //  /\\/\n"
+		<< "\t           (oo)\\ \\_//  /\n"
+		<< "\t          //_/\\_\\/ /  |\n"
+		<< "\t         @@/  |=\\  \\  |\n"
+		<< "\t              \\_=\\_ \\ |\n"
+		<< "\t                \\==\\ \\|\\_ \n"
+		<< "\t             __(\\===\\(  )\\\n"
+		<< "\t            (((~) __(_/   |\n"
+		<< "\t                 (((~) \\  /\n"
+		<< "\t                 ______/ /\n"
+		<< "\t                 '------'\n";
+
+
+	cout << "\nWould you like to try to fight or run?\n"
+		<< "1)Fight\n"
+		<< "2)Run\n";
+	//check that userChoice is valid
+	userChoice = intOneorTwo();	//this forces the user to type in a 1 or a 2 so I know userChoice is either a 1 or a 2 after that function
+	if (userChoice == 2)
+	{
+		//attempt to escape
+		bool hasEscaped = false;
+		hasEscaped = drag.isEscape();
+		if (hasEscaped == true)
+		{
+			return;
+		}
+	}
+	//else we fight
+	system("CLS");	//clears the screen
+	cout << "Player HP: " << p1.getHealth() << "\t\t\tSmall Dragon HP: " << drag.getHealth() << std::endl;
+	do
+	{
+		if (playerSkipTurn == false)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE6), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE6 is the playerHit, sync so that dragonBeingHit is heard after
+			drag.defend(p1.attack());	//player attacked the dragon and updated health
+			//PlaySound(MAKEINTRESOURCE(IDR_WAVE11), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE10 is the dragonBeingHit
+		}
+		else	//else it's true and the player skips a turn
+		{
+			cout << "\nYou just ate and can't hit this turn!\n";
+			playerSkipTurn = false;
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		}
+		if (drag.getIsAlive() == false)	//if dragon is dead
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));	//needed so player sees what they hit to kill the dragon
+			drag.setHealth(0);
+			system("CLS");
+			cout << "Player HP: " << p1.getHealth() << "\t\t\tSmall Dragon HP: " << drag.getHealth() << std::endl;
+			cout << "You defeated the small dragon!\n";
+			drag.deathLoot(p1);
+			break;
+		}
+
+		//End of turn for player attacking dragon
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tSmall Dragon HP: " << drag.getHealth() << std::endl;
+		//PlaySound(MAKEINTRESOURCE(IDR_WAVE13), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE13 is the dragonHit, sync to hear it before playerIsHit
+		p1.defend(drag.attack());	//dragon attacks player
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE9), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE9 is the playerIsHit
+																			 //std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		system("CLS");
+		cout << "Player HP: " << p1.getHealth() << "\t\t\tSmall Dragon HP: " << drag.getHealth() << std::endl;
+		//cin.clear();	//clears buffer before player is prompted if they want to go in their inventory
+		//cin.ignore(255, '\n');	//this doesn't work right now
+		if (p1.getHealth() > 0)
+		{
+			cout << "\nI- go inside your inventory!\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+			if (GetAsyncKeyState(0x49))	//TODO change this key to 'I'
+			{
+				cin.ignore(255, '\n');
+				cin.clear();
+				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
+				playerSkipTurn = p1.showAndIsUseInvFight();
+			}
+		}//if player is alive
+	} while (p1.getIsAlive() && drag.getIsAlive());	//while p1 is alive and dragon is alive, if one dies, fight is over
+	return;
+}
+
 Player::Player()
 {
 	health = 100;
@@ -945,9 +1047,10 @@ void Player::useItem(std::string item)
 	//"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"
 	if (item == "Fish") { health += 5; }
 	else if (item == "Minion Meat") { health += 10; }
+	else if (item == "Small Dragon Meat") { health += 15; }
 	else if (item == "Shark") { health += 20; }
 	else if (item == "Dragon Meat") { health += 25; }
-	cout << "You consumed the " << item << "! Current health is " << health << "/120\n";
+	cout << "You consumed the " << item << "! Current health is " << health << "/100\n";
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE18), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE18 is eating
 	return;
 }
@@ -1101,25 +1204,24 @@ void Minion::deathLoot(Player & p1)
 	return;
 }
 
-Boss::Boss()
+Dragon::Dragon()
 {
 	setHealth(85);
 	setAlive(true);
 	setAttackStat(25);
 	setStrengthStat(15);
-	setDefenceStat(5);
+	setDefenceStat(10);
 }
 
-//Boss attack is just like any attack but has a 10% chance to burn the player and inflict high damage
-int Boss::attack()
+//Dragon attack is just like any attack but has a 10% chance to burn the player and inflict high damage
+int Dragon::attack()
 {
 	int damage = (rand() % getStrengthStat());
 	double rerollDmg = getStrengthStat() * 0.20;	//this is 20% of our max hit
 	int burnChance = (rand() % 10);
 	if (burnChance == 0)	//burn the player
 	{
-		cout << "The boss burns you with his mighty dragon fire!\n";
-		//cout << "The boss deals: " << (damage + 20) << " damage!\n";
+		cout << "The Dragon burns you with his mighty dragon fire!\n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 		return (damage + 20);
 	}
@@ -1129,41 +1231,38 @@ int Boss::attack()
 		if (chance >= 0 && chance <= getAttackStat())	//this range is attackStat%
 		{
 			damage = (rand() % getStrengthStat());	//this still has the potential to be a weak or even worse hit but that's okay
-			//cout << "The boss deals: " << damage << " damage!\n";
 			return damage;
 		}
 		else	//else we don't reroll
 		{
-			//cout << "The boss deals: " << damage << " damage!\n";
 			return damage;
 		}
 	}
 	else	//else the damage is high enough to not need re-rolling
 	{
-		//cout << "The boss deals: " << damage << " damage!\n";
 		return damage;
 	}
 
-	return damage;	//boss can hit from 0-14
+	return damage;	//dragon can hit from 0-14
 }
 
-//Function return true if the player sucefully escaped from the boss, 5% chance of escaping
-bool Boss::isEscape()
+//Function return true if the player sucefully escaped from the Dragon, 5% chance of escaping
+bool Dragon::isEscape()
 {
 	//player will have a 5% chance of escaping any minion encounter
 	int chance = (rand() % 20);	//range is 0-19
 	if (chance == 0)
 	{
-		cout << "You have succefully escaped from the boss!\n\n";
+		cout << "You have succefully escaped from the Dragon!\n\n";
 		return true;
 	}
-	cout << "The boss doesn't let you run away!\n";
+	cout << "The Dragon doesn't let you run away!\n";
 	std::this_thread::sleep_for(std::chrono::milliseconds(1200));	//the code that happens after this is a clear screen so this is needed to see the statement
 	return false;	//else return false because the player did not manage to escape
 }
 
-//Function that tells the user the boss has died and rewards the player with loot
-void Boss::deathLoot(Player & p1)
+//Function that tells the user the Dragon has died and rewards the player with loot
+void Dragon::deathLoot(Player & p1)
 {
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE12 is the dragonDeath
 	//TODO add loot
@@ -1178,6 +1277,7 @@ void Boss::deathLoot(Player & p1)
 	return;
 }
 
+//Default mechanic for defending for all monsters unless the monster has special defensive mechanics
 void Monster::defend(int damage)
 {
 	//Monster defence will have a chance to reduce the incoming attack by a percentage
@@ -1209,4 +1309,77 @@ void Monster::defend(int damage)
 		}
 		return;
 	}
+}
+
+//Default constructor for a small dragon
+SmallDragon::SmallDragon()
+{
+	setHealth(35);
+	setAlive(true);
+	setAttackStat(12);
+	setStrengthStat(12);
+	setDefenceStat(7);
+}
+
+//Mechanic for a small dragon attack, include a weak dragon fire
+int SmallDragon::attack()
+{
+	int damage = (rand() % getStrengthStat());
+	double rerollDmg = getStrengthStat() * 0.20;	//this is 20% of our max hit
+	int burnChance = (rand() % 10);
+	if (burnChance == 0)	//burn the player
+	{
+		cout << "The small dragon burns you with its weak dragon fire!\n";
+		std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+		return (damage + 5);	//max hit is a 14
+	}
+	else if (damage < rerollDmg)	//else we don't burn the player and we check if we reroll the damage
+	{
+		int chance = (rand() % 100);
+		if (chance >= 0 && chance <= getAttackStat())	//this range is attackStat%
+		{
+			damage = (rand() % getStrengthStat());	//this still has the potential to be a weak or even worse hit but that's okay
+			return damage;
+		}
+		else	//else we don't reroll
+		{
+			return damage;
+		}
+	}
+	else	//else the damage is high enough to not need re-rolling
+	{
+		return damage;
+	}
+
+	return damage;	//small dragon can hit from 0-11(14 with dragon fire)
+}
+
+//chance of escaping from the small dragon is 14%
+bool SmallDragon::isEscape()
+{
+	//player will have a 14% chance of escaping any minion encounter
+	int chance = (rand() % 7);	//range is 0-6
+	if (chance == 0)
+	{
+		cout << "You have succefully escaped from the small dragon!\n\n";
+		return true;
+	}
+	cout << "The small dragon doesn't let you run away!\n";
+	std::this_thread::sleep_for(std::chrono::milliseconds(1200));	//the code that happens after this is a clear screen so this is needed to see the statement
+	return false;	//else return false because the player did not manage to escape
+}
+
+void SmallDragon::deathLoot(Player & p1)
+{
+	//PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE12 is the dragonDeath
+	//TODO add loot
+	cout << "You recieved 100 gold!\n";
+	p1.setGold(p1.getGold() + 100);
+	std::string loot[] = { "Small Dragon Meat" };	//expand on this later
+	int lootChance = rand() % 2;	//0 or 1
+	if (lootChance == 0)
+	{
+		p1.addItem("Small Dragon Meat");
+	}
+	return;
 }
