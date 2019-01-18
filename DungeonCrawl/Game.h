@@ -129,11 +129,11 @@ public:
 
 	ETypeOfEncounter getRoomType() { return roomType; }
 
-	void generateRoomType(ETypeOfEncounter &);
+	void generateRoomType(ETypeOfEncounter &, int);
 	void emptyRoom();
 	void minionRoom(Player &p1);
 	void bossRoom(Player &p1);
-	void treasureRoom(Player &p1);
+	void treasureRoom(Player &p1, int);
 	void shopRoom(Player &p1);
 	void swarmMinionRoom(Player &p1);
 };
