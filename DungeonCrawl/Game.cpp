@@ -16,7 +16,7 @@ using std::cin;
 Game::Game()
 {
 	gameOver = false;
-	maxRooms = 30;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
+	maxRooms = 50;	//TODO make this number depend on difficulty or simply just a value that is always different based on something
 	currentRoomNumber = 1;
 	lastRoom = ETypeOfEncounter::Null;
 }
@@ -34,7 +34,7 @@ EGameStatus Game::playGame()
 		* Run correct code based on encounter
 		*/
 		ETypeOfEncounter encounter;
-		dungeonRoom.generateRoomType(lastRoom);
+		dungeonRoom.generateRoomType(lastRoom, currentRoomNumber);
 		encounter = dungeonRoom.getRoomType();
 		lastRoom = encounter;	//setting up last room for next turn
 		switch (encounter)
@@ -57,7 +57,7 @@ EGameStatus Game::playGame()
 			break;
 		case ETypeOfEncounter::Treasure:
 			//execute code for treasure room
-			dungeonRoom.treasureRoom(player);
+			dungeonRoom.treasureRoom(player, currentRoomNumber);
 			break;
 		case ETypeOfEncounter::SwarmOfMinions:
 			dungeonRoom.swarmMinionRoom(player);
@@ -140,7 +140,8 @@ Dungeon::Dungeon()
 	roomType = ETypeOfEncounter::Empty;
 }
 
-void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom)
+//Generate a random room, cannot be previous room and checks on current room to see what it's allowed to generate
+void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom, int currentRoomNumber)
 {
 	//TODO create rarity to rooms
 	bool validRoom = false;
@@ -174,7 +175,26 @@ void Dungeon::generateRoomType(ETypeOfEncounter &lastRoom)
 		}//end of switch case
 		if (lastRoom != roomType)
 		{
-			validRoom = true;
+			if (currentRoomNumber == 10)	//first easy boss encounter
+			{
+				roomType = ETypeOfEncounter::SwarmOfMinions;
+				validRoom = true;
+			}
+			else if (currentRoomNumber == 20)	//first medium boss encounter
+			{
+				roomType = ETypeOfEncounter::Boss;
+				validRoom = true;
+			}
+			//else if(currentRoomNumber == 30)	//first hard boss encounter
+			else if (roomType == ETypeOfEncounter::SwarmOfMinions && currentRoomNumber < 10)	//cannot get swarm of minions before level 10
+				validRoom = false;
+			else if (roomType == ETypeOfEncounter::Boss && currentRoomNumber < 20)
+				validRoom = false;
+			//else if()
+			else	//else it's valid
+			{
+				validRoom = true;
+			}
 		}
 	} while (validRoom == false);
 	return;
@@ -385,7 +405,7 @@ void Dungeon::bossRoom(Player &p1)
 }
 
 //Player steps into room and has their inventory filled with random treasure items
-void Dungeon::treasureRoom(Player &p1)
+void Dungeon::treasureRoom(Player &p1, int currentRoomNumber)
 {
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE15), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE15 is the treasureRoom
 	cout << "You found the treasure room!\n";
@@ -393,10 +413,10 @@ void Dungeon::treasureRoom(Player &p1)
 	//create an array of treasures
 	int treasuresGold[] = { 25, 50, 100, 250, 500, 1000};	//6 items
 	std::string treasureStatBoost[] = {"+1 Attack", "+3 Attack", "+5 Attack", "+1 Strength", "+3 Strength", "+5 Strength", "+1 Defence", "+3 Defence", "+5 Defence" };	//9 items
-	std::string treasureFood[] = {"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"};	//5 items
+	std::string treasureFood[] = {"Fish", "Minion Meat", "Shark", "Dragon Meat"};	//4 items
 	//fish is +5 health, lobster is +10, Minion meat is +15, Shark is +20, Dragon meat is +25
 	//randomly choose an array of treasure 5 times, for each drop table landed on, only pick 1 item randomly from it and add it to the player's inventory
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < ((currentRoomNumber/10) +1); i++)	//from level 1-10, 1 roll, 11-20 will be 2 rolls, etc etc
 	{
 		int randomNum = rand() % 3;
 		if (randomNum == 0)	//land in the gold drop table
@@ -414,7 +434,7 @@ void Dungeon::treasureRoom(Player &p1)
 		}
 		else if (randomNum == 2)	//land in the food drop table
 		{
-			randomNum = rand() % 5;
+			randomNum = rand() % 4;
 			p1.addItem(treasureFood[randomNum]);
 		}
 		else
@@ -535,15 +555,15 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 6:	//full heal
-				if (p1.getGold() >= 120 && p1.getHealth() < 120)
+				if (p1.getGold() >= 120 && p1.getHealth() < 100)
 				{
 					p1.setGold(p1.getGold() - 120);
-					p1.setHealth(120);
-					cout << "Your health is now at: " << p1.getHealth() << "/120\n";
+					p1.setHealth(100);
+					cout << "Your health is now at: " << p1.getHealth() << "/100\n";
 				}
 				else	//not enough gold
 				{
-					if (p1.getHealth() >= 120)
+					if (p1.getHealth() >= 100)
 					{
 						cout << "You're already at max health!\n";
 					}
@@ -804,7 +824,7 @@ void Player::increaseStat(std::string stat)
 		//in the string, the 1 spot is going to hold the number
 		char number = stat[1];
 		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
-		if (attackStat >= 50)	//this is the cap so that the player cannot go above 50 in their stats
+		if (attackStat >= 35)	//this is the cap so that the player cannot go above 35 in their stats
 		{
 			cout << "Your current attack stat is already maxed out at: " << attackStat << std::endl;
 			return;
@@ -812,8 +832,8 @@ void Player::increaseStat(std::string stat)
 		else
 		{
 			attackStat += buff;	//buff has been applied
-			if (attackStat > 50)
-				attackStat = 50;	//this way it cannot go above 50
+			if (attackStat > 35)
+				attackStat = 35;	//this way it cannot go above 35
 			return;
 		}
 	}
@@ -823,7 +843,7 @@ void Player::increaseStat(std::string stat)
 		//in the string, the 1 spot is going to hold the number
 		char number = stat[1];
 		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
-		if (strengthStat >= 50)	//this is the cap so that the player cannot go above 50 in their stats
+		if (strengthStat >= 35)	//this is the cap so that the player cannot go above 35 in their stats
 		{
 			cout << "Your current strength stat is already maxed out at: " << strengthStat << std::endl;
 			return;
@@ -831,8 +851,8 @@ void Player::increaseStat(std::string stat)
 		else
 		{
 			strengthStat += buff;	//buff has been applied
-			if (strengthStat > 50)
-				strengthStat = 50;	//this way it cannot go above 50
+			if (strengthStat > 35)
+				strengthStat = 35;	//this way it cannot go above 35
 			return;
 		}
 	}
@@ -842,7 +862,7 @@ void Player::increaseStat(std::string stat)
 		//in the string, the 1 spot is going to hold the number
 		char number = stat[1];
 		int buff = number - '0';	//this is the ascii value - 48 since the number 0 is 48 on ascii table
-		if (defenceStat >= 50)	//this is the cap so that the player cannot go above 50 in their stats
+		if (defenceStat >= 35)	//this is the cap so that the player cannot go above 35 in their stats
 		{
 			cout << "Your current defence stat is already maxed out at: " << defenceStat << std::endl;
 			return;
@@ -850,8 +870,8 @@ void Player::increaseStat(std::string stat)
 		else
 		{
 			defenceStat += buff;	//buff has been applied
-			if (defenceStat > 50)
-				defenceStat = 50;	//this way it cannot go above 50
+			if (defenceStat > 35)
+				defenceStat = 35;	//this way it cannot go above 35
 			return;
 		}
 	}
@@ -903,9 +923,9 @@ void Player::showAndUseInv()
 		}
 		else
 		{
-			if (health >= 120)
+			if (health >= 100)
 			{
-				cout << "You're health is already at 120 or above! You cannot eat anymore food!\n";
+				cout << "You're health is already at 100 or above! You cannot eat anymore food!\n";
 			}
 			else
 			{
@@ -924,8 +944,7 @@ void Player::useItem(std::string item)
 {
 	//"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"
 	if (item == "Fish") { health += 5; }
-	else if (item == "Lobster") { health += 10; }
-	else if (item == "Minion Meat") { health += 15; }
+	else if (item == "Minion Meat") { health += 10; }
 	else if (item == "Shark") { health += 20; }
 	else if (item == "Dragon Meat") { health += 25; }
 	cout << "You consumed the " << item << "! Current health is " << health << "/120\n";
@@ -963,9 +982,9 @@ bool Player::showAndIsUseInvFight()
 	}
 	else
 	{
-		if (health >= 120)
+		if (health >= 100)
 		{
-			cout << "You're health is already at 120 or above! You cannot eat anymore food!\n";
+			cout << "You're health is already at 100 or above! You cannot eat anymore food!\n";
 		}
 		else
 		{
