@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-const int amountOfEncounterTypes = 6;
+const int amountOfEncounterTypes = 7;
 
 
 enum class EGameStatus
@@ -24,9 +24,10 @@ enum class ETypeOfEncounter
 	Treasure,
 	Minion,
 	Empty,
-	Boss,
+	Dragon,
 	Shop,
-	SwarmOfMinions
+	SwarmOfMinions,
+	SmallDragon
 };
 
 
@@ -108,12 +109,23 @@ public:
 };
 
 
-class Boss : public Monster
+class Dragon : public Monster
 {
 private:
 
 public:
-	Boss();
+	Dragon();
+	int attack();
+	bool isEscape();
+	void deathLoot(Player &p1);
+};
+
+class SmallDragon : public Monster
+{
+private:
+
+public:
+	SmallDragon();
 	int attack();
 	bool isEscape();
 	void deathLoot(Player &p1);
@@ -132,10 +144,11 @@ public:
 	void generateRoomType(ETypeOfEncounter &, int);
 	void emptyRoom();
 	void minionRoom(Player &p1);
-	void bossRoom(Player &p1);
+	void dragonRoom(Player &p1);
 	void treasureRoom(Player &p1, int);
 	void shopRoom(Player &p1);
 	void swarmMinionRoom(Player &p1);
+	void smallDragonRoom(Player &p1);
 };
 
 
