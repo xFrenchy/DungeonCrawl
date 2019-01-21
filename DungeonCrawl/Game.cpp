@@ -507,14 +507,14 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 3:	//+1 attack
-				if (p1.getGold() >= 200 && p1.getAttackStat() < 50)
+				if (p1.getGold() >= 200 && p1.getAttackStat() < 35)
 				{
 					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Attack");
 				}
 				else	//not enough gold
 				{
-					if (p1.getAttackStat() >= 50)
+					if (p1.getAttackStat() >= 35)
 					{
 						cout << "Your attack stat is already maxed out!\n";
 					}
@@ -525,14 +525,14 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 4:	//+1 str
-				if (p1.getGold() >= 200 && p1.getStrengthStat() < 50)
+				if (p1.getGold() >= 200 && p1.getStrengthStat() < 35)
 				{
 					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Strength");
 				}
 				else	//not enough gold
 				{
-					if (p1.getStrengthStat() >= 50)
+					if (p1.getStrengthStat() >= 35)
 					{
 						cout << "Your strength stat is already maxed out!\n";
 					}
@@ -543,14 +543,14 @@ void Dungeon::shopRoom(Player &p1)
 				}
 				break;
 			case 5:	//+1 def
-				if (p1.getGold() >= 200 && p1.getDefenceStat() < 50)
+				if (p1.getGold() >= 200 && p1.getDefenceStat() < 35)
 				{
 					p1.setGold(p1.getGold() - 200);
 					p1.increaseStat("+1 Defence");
 				}
 				else	//not enough gold
 				{
-					if (p1.getDefenceStat() >= 50)
+					if (p1.getDefenceStat() >= 35)
 					{
 						cout << "Your defence stat is already maxed out!\n";
 					}
