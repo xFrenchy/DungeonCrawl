@@ -39,6 +39,10 @@ enum class EConsumable
      Dragon_meat
 };
 
+enum class ERawMaterial
+{
+
+};
 
 class Player
 {
