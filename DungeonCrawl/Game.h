@@ -30,6 +30,15 @@ enum class ETypeOfEncounter
 	SmallDragon
 };
 
+enum class EConsumable
+{
+     Fish,
+     Minion_meat,
+     Small_dragon_meat,
+     Shark,
+     Dragon_meat
+};
+
 
 class Player
 {
@@ -40,7 +49,7 @@ private:
 	int attackStat;
 	int strengthStat;
 	int defenceStat;
-	std::vector<std::string> inventory;
+	std::vector<std::string> inventoryConsume;
 public:
 	Player();
 	void setHealth(int _health) { health = _health; }
@@ -62,9 +71,9 @@ public:
 	void addItem(std::string);
 	void increaseStat(std::string);
 	void displayStat();
-	void showAndUseInv();
+	void showAndUseInvC();
 	void useItem(std::string);
-	bool showAndIsUseInvFight();
+	bool showAndIsUseInvCFight();
 };
 
 
