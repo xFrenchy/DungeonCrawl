@@ -114,7 +114,7 @@ EGameStatus Game::playGame()
 				}
 				else if (answer == 'I')
 				{
-					player.showAndUseInv();
+					player.showAndUseInvC();
 					moveForward = false;
 				}
 			}
@@ -210,7 +210,7 @@ void Dungeon::emptyRoom()
 {
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE14), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE14 is empty room
 	cout << "\nThis rooms seems to be empty...Nothing to do here.\n";
-	//TODO ask the user if they want to use their inventory before proceeding
+	//TODO implement skilling into this room
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	return;
 }
@@ -294,7 +294,7 @@ void Dungeon::minionRoom(Player &p1)
 				cin.ignore(255, '\n');
 				cin.clear();
 				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
-				playerSkipTurn = p1.showAndIsUseInvFight();
+				playerSkipTurn = p1.showAndIsUseInvCFight();
 			}
 		}//if player is alive
 
@@ -403,7 +403,7 @@ void Dungeon::dragonRoom(Player &p1)
 				cin.ignore(255, '\n');
 				cin.clear();
 				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
-				playerSkipTurn = p1.showAndIsUseInvFight();
+				playerSkipTurn = p1.showAndIsUseInvCFight();
 			}
 		}//if player is alive
 	} while (p1.getIsAlive() && boss.getIsAlive());	//while p1 is alive and dragon is alive, if one dies, fight is over
@@ -419,15 +419,16 @@ void Dungeon::treasureRoom(Player &p1, int currentRoomNumber)
 	//create an array of treasures
 	int treasuresGold[] = { 25, 50, 100, 250, 500, 1000};	//6 items
 	std::string treasureStatBoost[] = {"+1 Attack", "+3 Attack", "+5 Attack", "+1 Strength", "+3 Strength", "+5 Strength", "+1 Defence", "+3 Defence", "+5 Defence" };	//9 items
-	std::string treasureFood[] = {"Fish", "Minion Meat", "Shark", "Dragon Meat"};	//4 items
-	//fish is +5 health, lobster is +10, Minion meat is +15, Shark is +20, Dragon meat is +25
+	std::string treasureFood[] = {"Fish", "Minion Meat", "Small Dragon Meat", "Shark", "Dragon Meat"};	//5 items
+	//fish is +5 health, Minion meat is +10,Small Dragon Meat is +15, Shark is +20, Dragon meat is +25
 	//randomly choose an array of treasure 5 times, for each drop table landed on, only pick 1 item randomly from it and add it to the player's inventory
-	for (int i = 0; i < ((currentRoomNumber/10) +1); i++)	//from level 1-10, 1 roll, 11-20 will be 2 rolls, etc etc
+     int amountOfRolls = (currentRoomNumber / 10) + 2;
+	for (int i = 0; i < amountOfRolls; i++)	//from level 1-10, 2 roll, 11-20 will be 3 rolls, maxes out at 5 rolls
 	{
 		int randomNum = rand() % 3;
 		if (randomNum == 0)	//land in the gold drop table
 		{
-			randomNum = rand() % 6;
+			randomNum = rand() % 6;  //try to change this is the drop table.size() if possible instead of hardcoded number
 			int gold = treasuresGold[randomNum];
 			cout << "You recieved " << gold << " gold!\n";
 			p1.setGold(p1.getGold() + gold);
@@ -440,7 +441,7 @@ void Dungeon::treasureRoom(Player &p1, int currentRoomNumber)
 		}
 		else if (randomNum == 2)	//land in the food drop table
 		{
-			randomNum = rand() % 4;
+			randomNum = rand() % 5;
 			p1.addItem(treasureFood[randomNum]);
 		}
 		else
@@ -722,7 +723,7 @@ void Dungeon::swarmMinionRoom(Player & p1)
 				cin.ignore(255, '\n');
 				cin.clear();
 				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
-				playerSkipTurn = p1.showAndIsUseInvFight();
+				playerSkipTurn = p1.showAndIsUseInvCFight();
 			}
 		}//if player is alive
 
@@ -819,7 +820,7 @@ void Dungeon::smallDragonRoom(Player & p1)
 				cin.ignore(255, '\n');
 				cin.clear();
 				//clear buffer so that it doesn't go inside the if statement if the user spams iiiii to get into it once
-				playerSkipTurn = p1.showAndIsUseInvFight();
+				playerSkipTurn = p1.showAndIsUseInvCFight();
 			}
 		}//if player is alive
 	} while (p1.getIsAlive() && drag.getIsAlive());	//while p1 is alive and dragon is alive, if one dies, fight is over
@@ -907,7 +908,7 @@ void Player::addItem(std::string item)
 {
 	//TODO look into creating stack so objects aka if there is a shark in the player's iventory, make it display 2x sharks into of shark shark
 	cout << "You recieved: " << item << "!\n";
-	inventory.push_back(item);
+	inventoryConsume.push_back(item);
 }
 
 //Takes in a boost and applies it to the player
@@ -990,15 +991,15 @@ void Player::displayStat()
 }
 
 //Shows the player the inventory and allows the player to use it
-void Player::showAndUseInv()
+void Player::showAndUseInvC()
 {
 	bool exit = false;
 	do
 	{
 		cout << "Gold: " << gold << "\n";
-		for (int i = 0; i < inventory.size(); i++)
+		for (int i = 0; i < inventoryConsume.size(); i++)
 		{
-			cout << (i + 1) << ". " << inventory[i] << std::endl;
+			cout << (i + 1) << ". " << inventoryConsume[i] << std::endl;
 		}
 		cout << "0. to exit" << std::endl;
 		bool valid = false;
@@ -1006,7 +1007,7 @@ void Player::showAndUseInv()
 		do
 		{
 			cin >> answer;
-			if (answer < 0 || answer > inventory.size())
+			if (answer < 0 || answer > inventoryConsume.size())
 			{
 				cout << "Invalid option!\n";
 				cin.clear();
@@ -1031,10 +1032,10 @@ void Player::showAndUseInv()
 			}
 			else
 			{
-				std::string item = inventory[answer - 1];
+				std::string item = inventoryConsume[answer - 1];
 				//delete item from inventory and shift everything over
 				//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
-				inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
+				inventoryConsume.erase(inventoryConsume.begin() + (answer - 1));	//erase shifts everything over automatically
 				useItem(item);
 			}
 		}//else if answer isn't 0
@@ -1055,11 +1056,11 @@ void Player::useItem(std::string item)
 	return;
 }
 
-bool Player::showAndIsUseInvFight()
+bool Player::showAndIsUseInvCFight()
 {
-	for (int i = 0; i < inventory.size(); i++)
+	for (int i = 0; i < inventoryConsume.size(); i++)
 	{
-		cout << (i + 1) << ". " << inventory[i] << std::endl;
+		cout << (i + 1) << ". " << inventoryConsume[i] << std::endl;
 	}
 	cout << "0. to exit" << std::endl;
 	bool valid = false;
@@ -1067,7 +1068,7 @@ bool Player::showAndIsUseInvFight()
 	do
 	{
 		cin >> answer;
-		if (answer < 0 || answer > inventory.size())
+		if (answer < 0 || answer > inventoryConsume.size())
 		{
 			cout << "Invalid option!\n";
 			cin.clear();
@@ -1091,10 +1092,10 @@ bool Player::showAndIsUseInvFight()
 		}
 		else
 		{
-			std::string item = inventory[answer - 1];
+			std::string item = inventoryConsume[answer - 1];
 			//delete item from inventory and shift everything over
 			//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
-			inventory.erase(inventory.begin() + (answer - 1));	//erase shifts everything over automatically
+			inventoryConsume.erase(inventoryConsume.begin() + (answer - 1));	//erase shifts everything over automatically
 			useItem(item);
 			return true;
 		}
@@ -1142,36 +1143,6 @@ int Minion::attack()
 	
 	return damage;	//minion can hit from 0-9
 }
-
-/*void Minion::defend(int damage)
-{
-	//Minion defence will have a chance to reduce the incoming attack by a percentage
-	int chanceToReduce = (rand() % 100);
-	if (chanceToReduce >= 0 && chanceToReduce <= getDefenceStat())	//The higher the defence stat, the higher range we cover to be able to reduce
-	{
-		//reduce the damage by 5% of the minion defence stats
-		double reducedDmg = damage * 0.05;
-		damage -= reducedDmg;
-		//now update the minion's health
-		cout << "The minion takes: " << damage << "damage!(reduced)\n";
-		setHealth(getHealth() - damage);	//updated minion health
-		if (getHealth() <= 0)
-		{
-			setAlive(false);
-		}
-		return;
-	}
-	else	//else we don't reduce the damage
-	{
-		cout << "The minion takes: " << damage << "damage!\n";
-		setHealth(getHealth() - damage);	//updated minion health
-		if (getHealth() <= 0)
-		{
-			setAlive(false);
-		}
-		return;
-	}
-}*/
 
 //Function returns true if the player sucefully escaped from the minion, 25% chance of escaping
 bool Minion::isEscape()
