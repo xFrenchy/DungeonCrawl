@@ -417,9 +417,31 @@ void Dungeon::treasureRoom(Player &p1, int currentRoomNumber)
 	cout << "You found the treasure room!\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	//create an array of treasures
+     Item Fish, MinionMeat, SmallDragonMeat, Shark, DragonMeat;
+     Fish.name = "Fish Meat";
+     Fish.HealValue = 5;
+     Fish.consumable = true;
+     Fish.amount = 1;
+     MinionMeat.name = "Minion Meat";
+     MinionMeat.HealValue = 10;
+     MinionMeat.consumable = true;
+     MinionMeat.amount = 1;
+     SmallDragonMeat.name = "Small Dragon Meat";
+     SmallDragonMeat.HealValue = 15;
+     SmallDragonMeat.consumable = true;
+     SmallDragonMeat.amount = 1;
+     Shark.name = "Shark Meat";
+     Shark.HealValue = 20;
+     Shark.consumable = true;
+     Shark.amount = 1;
+     DragonMeat.name = "Dragon Meat";
+     DragonMeat.HealValue = 25;
+     DragonMeat.consumable = true;
+     DragonMeat.amount = 1;
+     //TODO create a different struct and constructor for each item to reduce this huge chunk of code
 	int treasuresGold[] = { 25, 50, 100, 250, 500, 1000};	//6 items
 	std::string treasureStatBoost[] = {"+1 Attack", "+3 Attack", "+5 Attack", "+1 Strength", "+3 Strength", "+5 Strength", "+1 Defence", "+3 Defence", "+5 Defence" };	//9 items
-	std::string treasureFood[] = {"Fish", "Minion Meat", "Small Dragon Meat", "Shark", "Dragon Meat"};	//5 items
+	Item treasureFood[] = {Fish, MinionMeat, SmallDragonMeat, Shark, DragonMeat};	//5 items
 	//fish is +5 health, Minion meat is +10,Small Dragon Meat is +15, Shark is +20, Dragon meat is +25
 	//randomly choose an array of treasure 5 times, for each drop table landed on, only pick 1 item randomly from it and add it to the player's inventory
      int amountOfRolls = (currentRoomNumber / 10) + 2;
@@ -454,6 +476,15 @@ void Dungeon::treasureRoom(Player &p1, int currentRoomNumber)
 //Player steps into room and is prompted with a shop, player can buy items if they have enough gold and can buy as many items as they want
 void Dungeon::shopRoom(Player &p1)
 {
+     Item Fish, Shark;
+     Fish.name = "Fish Meat";
+     Fish.HealValue = 5;
+     Fish.consumable = true;
+     Fish.amount = 1;
+     Shark.name = "Shark Meat";
+     Shark.HealValue = 20;
+     Shark.consumable = true;
+     Shark.amount = 1;
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE16), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE16 is the shopRoom
 	cout << "You found the shop room!A merchant has been awaiting for your arrival\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -489,7 +520,7 @@ void Dungeon::shopRoom(Player &p1)
 				if (p1.getGold() >= 20)
 				{
 					p1.setGold(p1.getGold() - 20);
-					p1.addItem("Fish");
+					p1.addItem(Fish);
 				}
 				else	//not enough gold
 				{
@@ -500,7 +531,7 @@ void Dungeon::shopRoom(Player &p1)
 				if (p1.getGold() >= 100)
 				{
 					p1.setGold(p1.getGold() - 100);
-					p1.addItem("Shark");
+					p1.addItem(Shark);
 				}
 				else	//not enough gold
 				{
@@ -904,11 +935,36 @@ void Player::defend(int damage)
 }
 
 //Adds an item to the player's inventory
-void Player::addItem(std::string item)
+void Player::addItem(Item item)
 {
-	//TODO look into creating stack so objects aka if there is a shark in the player's iventory, make it display 2x sharks into of shark shark
-	cout << "You recieved: " << item << "!\n";
-	inventoryConsume.push_back(item);
+	//TODO look into creating stack of objects aka if there is a shark in the player's iventory, make it display 2x sharks into of shark shark
+	cout << "You recieved: " << item.name << " x" << item.amount << "!\n";
+     if (item.consumable == true)
+     {
+          for (int i = 0; i < inventoryConsume.size(); i++) //look inside the inventory to see if the player already has a stack of this item
+          {
+               if (item.name == inventoryConsume[i].name)   //if match is found
+               {
+                    inventoryConsume[i].amount += item.amount; //increase the stack by however many items we got
+                    return;    //exit the code
+               }
+          }
+          //if we've arrived here then there was no match and we add the new item to the inventory
+          inventoryConsume.push_back(item);
+     }
+     else
+     {
+          for (int i = 0; i < inventoryRawMats.size(); i++) //look inside the inventory to see if the player already has a stack of this item
+          {
+               if (item.name == inventoryRawMats[i].name)   //if match is found
+               {
+                    inventoryRawMats[i].amount += item.amount; //increase the stack by however many items we got
+                    return;    //exit the code
+               }
+          }
+          //if we've arrived here then there was no match and we add the new item to the inventory
+          inventoryRawMats.push_back(item);
+     }
 }
 
 //Takes in a boost and applies it to the player
@@ -999,7 +1055,7 @@ void Player::showAndUseInvC()
 		cout << "Gold: " << gold << "\n";
 		for (int i = 0; i < inventoryConsume.size(); i++)
 		{
-			cout << (i + 1) << ". " << inventoryConsume[i] << std::endl;
+			cout << (i + 1) << ". " << inventoryConsume[i].name << " x" << inventoryConsume[i].amount << std::endl;
 		}
 		cout << "0. to exit" << std::endl;
 		bool valid = false;
@@ -1032,10 +1088,14 @@ void Player::showAndUseInvC()
 			}
 			else
 			{
-				std::string item = inventoryConsume[answer - 1];
-				//delete item from inventory and shift everything over
+				Item item = inventoryConsume[answer - 1];
+                    inventoryConsume[answer - 1].amount--;  //decreased the amount from the stack
+				//delete item from inventory and shift everything over if needed
 				//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
-				inventoryConsume.erase(inventoryConsume.begin() + (answer - 1));	//erase shifts everything over automatically
+                    if (inventoryConsume[answer - 1].amount == 0)     //if the stack of the item is empty, remove it from the inv
+                    {
+                         inventoryConsume.erase(inventoryConsume.begin() + (answer - 1));	//erase shifts everything over automatically
+                    }
 				useItem(item);
 			}
 		}//else if answer isn't 0
@@ -1043,15 +1103,16 @@ void Player::showAndUseInvC()
 }
 
 //Recieves an item to use on the player
-void Player::useItem(std::string item)
+void Player::useItem(Item item)
 {
+     health += item.HealValue;
 	//"Fish", "Lobster", "Minion Meat", "Shark", "Dragon Meat"
-	if (item == "Fish") { health += 5; }
+	/*if (item == "Fish") { health += 5; }
 	else if (item == "Minion Meat") { health += 10; }
 	else if (item == "Small Dragon Meat") { health += 15; }
 	else if (item == "Shark") { health += 20; }
-	else if (item == "Dragon Meat") { health += 25; }
-	cout << "You consumed the " << item << "! Current health is " << health << "/100\n";
+	else if (item == "Dragon Meat") { health += 25; }*/
+	cout << "You consumed the " << item.name << "! Current health is " << health << "/100\n";
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE18), NULL, SND_RESOURCE | SND_ASYNC);//IDR_WAVE18 is eating
 	return;
 }
@@ -1060,7 +1121,7 @@ bool Player::showAndIsUseInvCFight()
 {
 	for (int i = 0; i < inventoryConsume.size(); i++)
 	{
-		cout << (i + 1) << ". " << inventoryConsume[i] << std::endl;
+		cout << (i + 1) << ". " << inventoryConsume[i].name << " x" << inventoryConsume[i].amount << std::endl;
 	}
 	cout << "0. to exit" << std::endl;
 	bool valid = false;
@@ -1092,11 +1153,15 @@ bool Player::showAndIsUseInvCFight()
 		}
 		else
 		{
-			std::string item = inventoryConsume[answer - 1];
-			//delete item from inventory and shift everything over
-			//https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
-			inventoryConsume.erase(inventoryConsume.begin() + (answer - 1));	//erase shifts everything over automatically
-			useItem(item);
+               Item item = inventoryConsume[answer - 1];
+               inventoryConsume[answer - 1].amount--;  //decreased the amount from the stack
+               //delete item from inventory and shift everything over if needed
+               //https://stackoverflow.com/questions/875103/how-do-i-erase-an-element-from-stdvector-by-index
+               if (inventoryConsume[answer - 1].amount == 0)     //if the stack of the item is empty, remove it from the inv
+               {
+                    inventoryConsume.erase(inventoryConsume.begin() + (answer - 1));	//erase shifts everything over automatically
+               }
+               useItem(item);
 			return true;
 		}
 	}//else if answer isn't 0
@@ -1162,6 +1227,11 @@ bool Minion::isEscape()
 //Function that tells the user the minion has died and rewards the player with loot
 void Minion::deathLoot(Player & p1)
 {
+     Item MinionMeat;
+     MinionMeat.name = "Minion Meat";
+     MinionMeat.HealValue = 10;
+     MinionMeat.consumable = true;
+     MinionMeat.amount = 1;
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE7), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE7 is the minion death
 	//TODO add better loot
 	cout << "You recieved 50 gold!\n";
@@ -1170,7 +1240,7 @@ void Minion::deathLoot(Player & p1)
 	int lootChance = rand() % 2;	//0 or 1
 	if (lootChance == 0)
 	{
-		p1.addItem("Minion Meat");
+		p1.addItem(MinionMeat);
 	}
 	return;
 }
@@ -1235,6 +1305,11 @@ bool Dragon::isEscape()
 //Function that tells the user the Dragon has died and rewards the player with loot
 void Dragon::deathLoot(Player & p1)
 {
+     Item DragonMeat;
+     DragonMeat.name = "Dragon Meat";
+     DragonMeat.HealValue = 25;
+     DragonMeat.consumable = true;
+     DragonMeat.amount = 1;
 	PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE12 is the dragonDeath
 	//TODO add loot
 	cout << "You recieved 200 gold!\n";
@@ -1243,7 +1318,7 @@ void Dragon::deathLoot(Player & p1)
 	int lootChance = rand() % 2;	//0 or 1
 	if (lootChance == 0)
 	{
-		p1.addItem("Dragon Meat");
+		p1.addItem(DragonMeat);
 	}
 	return;
 }
@@ -1342,6 +1417,11 @@ bool SmallDragon::isEscape()
 
 void SmallDragon::deathLoot(Player & p1)
 {
+     Item SmallDragonMeat;
+     SmallDragonMeat.name = "Small Dragon Meat";
+     SmallDragonMeat.HealValue = 15;
+     SmallDragonMeat.consumable = true;
+     SmallDragonMeat.amount = 1;
 	//PlaySound(MAKEINTRESOURCE(IDR_WAVE12), NULL, SND_RESOURCE | SND_SYNC);//IDR_WAVE12 is the dragonDeath
 	//TODO add loot
 	cout << "You recieved 100 gold!\n";
@@ -1350,7 +1430,7 @@ void SmallDragon::deathLoot(Player & p1)
 	int lootChance = rand() % 2;	//0 or 1
 	if (lootChance == 0)
 	{
-		p1.addItem("Small Dragon Meat");
+		p1.addItem(SmallDragonMeat);
 	}
 	return;
 }
